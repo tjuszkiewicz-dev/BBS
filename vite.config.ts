@@ -18,6 +18,19 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              'vendor-react':   ['react', 'react-dom'],
+              'vendor-charts':  ['recharts'],
+              'vendor-icons':   ['lucide-react'],
+              'vendor-ai':      ['@google/generative-ai'],
+              'vendor-pdf':     ['html2pdf.js'],
+            }
+          }
+        }
       }
     };
 });
