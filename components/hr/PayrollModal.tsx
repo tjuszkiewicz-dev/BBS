@@ -22,10 +22,11 @@ export const PayrollModal: React.FC<PayrollModalProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Stats
-  const matchedCount = payrollData.filter(e => e.status === 'MATCHED').length;
+  // Stats — treat MISSING (valid amounts, user not yet in system) same as MATCHED
+  const isEntryValid = (e: PayrollEntry) => (e.status === 'MATCHED' || e.status === 'MISSING') && !e.validationError;
+  const matchedCount = payrollData.filter(isEntryValid).length;
   const invalidCount = payrollData.filter(e => e.status === 'INVALID_AMOUNT').length;
-  const totalVouchers = payrollData.filter(e => e.status === 'MATCHED').reduce((acc, curr) => acc + Math.floor(curr.voucherPartNet), 0);
+  const totalVouchers = payrollData.filter(isEntryValid).reduce((acc, curr) => acc + Math.floor(curr.voucherPartNet), 0);
 
   useEffect(() => {
     if (isOpen) {
@@ -115,7 +116,7 @@ export const PayrollModal: React.FC<PayrollModalProps> = ({
   };
 
   const handleApply = () => {
-    const validEntries = payrollData.filter(e => e.status === 'MATCHED' && !e.validationError);
+    const validEntries = payrollData.filter(isEntryValid);
     const finalVoucherSum = validEntries.reduce((acc, curr) => acc + Math.floor(curr.voucherPartNet), 0);
     onApplyToOrder(finalVoucherSum, validEntries);
     onClose();
@@ -210,7 +211,7 @@ export const PayrollModal: React.FC<PayrollModalProps> = ({
                     <tbody className="divide-y divide-slate-100">
                         {payrollData.map((entry, idx) => {
                             const isError = !!entry.validationError || entry.status === 'INVALID_AMOUNT';
-                            const isEditable = entry.status === 'MATCHED' || (entry.status as string) === 'INVALID_AMOUNT'; 
+                            const isEditable = entry.status === 'MATCHED' || entry.status === 'MISSING' || entry.status === 'INVALID_AMOUNT';
                             const isUZ = entry.contractType === 'UZ';
 
                             return (
