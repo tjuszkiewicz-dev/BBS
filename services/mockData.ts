@@ -1,4 +1,4 @@
-
+﻿
 import { Company, Role, User, Voucher, VoucherStatus, Order, OrderStatus, AuditLogEntry, Commission, Notification, NotificationConfig, NotificationTarget, NotificationTrigger, ServiceItem, ServiceType, Transaction, SystemConfig, DocumentType, ContractType, SupportTicket } from '../types';
 
 // Struktura Sprzedaży
@@ -10,7 +10,7 @@ const BUYBACK_TEMPLATE_CONTENT = `UMOWA ODKUPU VOUCHERÓW NR: {AGREEMENT_ID}
 
 Zawarta w dniu {DATE} pomiędzy:
 
-1. STRATTON PRIME S.A. z siedzibą w Warszawie (Właściciel Platformy Eliton), zwanym dalej "Operatorem",
+1. STRATTON PRIME S.A. z siedzibą w Warszawie (Właściciel platformy BBS), zwanym dalej "Operatorem",
 a
 2. {USER_NAME} (ID Systemowe: {USER_ID}), zwanym dalej "Użytkownikiem".
 
@@ -23,11 +23,11 @@ a
 2. Z chwilą zatwierdzenia niniejszej umowy Vouchery zostają trwale wycofane z obiegu (anulowane) i nie mogą być wykorzystane do zakupu usług.
 
 §3 POSTANOWIENIA KOŃCOWE
-1. Umowa została wygenerowana elektronicznie w systemie Eliton Benefits System (EBS) i nie wymaga odręcznego podpisu.
+1. Umowa została wygenerowana elektronicznie w systemie BBS (EBS) i nie wymaga odręcznego podpisu.
 2. Data wygenerowania dokumentu jest datą skutecznego zawarcia umowy pod warunkiem jej zatwierdzenia przez Operatora.
 
 PODPISANO:
-Operator: System Eliton (w im. Stratton Prime)
+Operator: System BBS (w im. Stratton Prime)
 Użytkownik: {USER_NAME} (Akceptacja Elektroniczna)`;
 
 export const INITIAL_SYSTEM_CONFIG: SystemConfig = {
@@ -62,7 +62,7 @@ export const INITIAL_SYSTEM_CONFIG: SystemConfig = {
         id: 'TPL-002',
         name: 'Regulamin Platformy 2025',
         type: DocumentType.POLICY,
-        content: `REGULAMIN SYSTEMU BENEFITOWEGO ELITON (EBS)\n\n§1 Postanowienia Ogólne\n1. Operatorem systemu jest Stratton Prime S.A.\n2. Użytkownik zobowiązany jest do...`,
+        content: `REGULAMIN SYSTEMU BENEFITOWEGO BBS (EBS)\n\n§1 Postanowienia Ogólne\n1. Operatorem systemu jest Stratton Prime S.A.\n2. Użytkownik zobowiązany jest do...`,
         version: 2,
         lastModified: new Date().toISOString(),
         accessRoles: [Role.SUPERADMIN, Role.HR, Role.EMPLOYEE],
@@ -88,10 +88,12 @@ export const INITIAL_USERS: User[] = [
     id: 'ADM-001',
     role: Role.SUPERADMIN,
     name: 'System Administrator',
-    email: 'admin@eliton-benefits.com',
+    email: 'admin@bbs-benefits.com',
     voucherBalance: 0,
     status: 'ACTIVE',
-    identity: { firstName: 'System', lastName: 'Administrator', pesel: '', email: 'admin@eliton-benefits.com' },
+    username: 'admin',
+    password: '123',
+    identity: { firstName: 'System', lastName: 'Administrator', pesel: '', email: 'admin@bbs-benefits.com' },
     organization: { department: 'IT', position: 'Superadmin' },
     isTwoFactorEnabled: true // ENFORCE 2FA FOR ADMIN DEMO
   },
@@ -100,30 +102,32 @@ export const INITIAL_USERS: User[] = [
     id: ADVISOR_ID,
     role: Role.ADVISOR,
     name: 'Adam Doradca',
-    email: 'adam.d@eliton-benefits.com',
+    email: 'adam.d@bbs-benefits.com',
     voucherBalance: 0,
     status: 'ACTIVE',
-    identity: { firstName: 'Adam', lastName: 'Doradca', pesel: '', email: 'adam.d@eliton-benefits.com' },
+    username: 'adam.d',
+    password: '123',
+    identity: { firstName: 'Adam', lastName: 'Doradca', pesel: '', email: 'adam.d@bbs-benefits.com' },
     organization: { department: 'Sales', position: 'Advisor' }
   },
   {
     id: MANAGER_ID,
     role: Role.MANAGER,
     name: 'Marek Manager',
-    email: 'marek.m@eliton-benefits.com',
+    email: 'marek.m@bbs-benefits.com',
     voucherBalance: 0,
     status: 'ACTIVE',
-    identity: { firstName: 'Marek', lastName: 'Manager', pesel: '', email: 'marek.m@eliton-benefits.com' },
+    identity: { firstName: 'Marek', lastName: 'Manager', pesel: '', email: 'marek.m@bbs-benefits.com' },
     organization: { department: 'Sales', position: 'Manager' }
   },
   {
     id: DIRECTOR_ID,
     role: Role.DIRECTOR,
     name: 'Daria Dyrektor',
-    email: 'daria.d@eliton-benefits.com',
+    email: 'daria.d@bbs-benefits.com',
     voucherBalance: 0,
     status: 'ACTIVE',
-    identity: { firstName: 'Daria', lastName: 'Dyrektor', pesel: '', email: 'daria.d@eliton-benefits.com' },
+    identity: { firstName: 'Daria', lastName: 'Dyrektor', pesel: '', email: 'daria.d@bbs-benefits.com' },
     organization: { department: 'Sales', position: 'Director' }
   },
   // --- Clients ---
@@ -138,6 +142,8 @@ export const INITIAL_USERS: User[] = [
     department: 'HR',
     position: 'Manager',
     status: 'ACTIVE',
+    username: 'hr',
+    password: '123',
     identity: { firstName: 'Anna', lastName: 'Nowak', pesel: '85010112345', email: 'hr@techsolutions.pl' },
     organization: { department: 'HR', position: 'Manager' }
   },
@@ -148,6 +154,8 @@ export const INITIAL_USERS: User[] = [
     companyId: 'FIRMA-042',
     status: 'ACTIVE',
     voucherBalance: 150,
+    username: 'jan.kowalski',
+    password: '123',
     
     // Facade
     name: 'Jan Kowalski',
@@ -682,20 +690,20 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   { id: 'SRV-MH-01', name: 'Cyfrowy detoks w 15 minut', description: 'Jak odzyskać spokój bez wyrzucania telefonu.', price: 9, type: ServiceType.ONE_TIME, icon: 'Smartphone', image: 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-MH-02', name: 'Trening odporności na stres (Resilience)', description: 'Techniki jednostek specjalnych dla korporacji.', price: 33, type: ServiceType.ONE_TIME, icon: 'Heart', image: 'https://images.unsplash.com/photo-1522204538344-922f76ecc041?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-MH-03', name: 'Sztuka asertywności na Teamsach', description: 'Jak mówić "nie" bez poczucia winy.', price: 21, type: ServiceType.ONE_TIME, icon: 'MessageSquare', image: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-MH-04', name: 'Sen jako Twój najlepszy projekt', description: 'Biohacking nocnej regeneracji.', price: 44, type: ServiceType.ONE_TIME, icon: 'Moon', image: 'https://images.unsplash.com/photo-1511296933631-18b46797e652?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-MH-04', name: 'Sen jako Twój najlepszy projekt', description: 'Biohacking nocnej regeneracji.', price: 44, type: ServiceType.ONE_TIME, icon: 'Moon', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-MH-05', name: 'Praca z domu i samotność', description: 'Jak budować relacje w trybie remote.', price: 15, type: ServiceType.ONE_TIME, icon: 'Users', image: 'https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&q=80&w=800', isActive: true },
 
   // --- FINANCE & GROWTH ---
   { id: 'SRV-FIN-01', name: 'Inwestowanie dla ostrożnych', description: 'Podstawy budowania poduszki finansowej.', price: 28, type: ServiceType.ONE_TIME, icon: 'DollarSign', image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-FIN-02', name: 'Psychologia zakupów online', description: 'Jak nie dać się zmanipulować algorytmom.', price: 7, type: ServiceType.ONE_TIME, icon: 'ShoppingCart', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-FIN-02', name: 'Psychologia zakupów online', description: 'Jak nie dać się zmanipulować algorytmom.', price: 7, type: ServiceType.ONE_TIME, icon: 'ShoppingCart', image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-FIN-03', name: 'Negocjacje podwyżki w 2026', description: 'Nowoczesne argumenty oparte na danych.', price: 42, type: ServiceType.ONE_TIME, icon: 'TrendingUp', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-FIN-04', name: 'Personal Branding wewnątrz firmy', description: 'Jak być widocznym, nie będąc nachalnym.', price: 19, type: ServiceType.ONE_TIME, icon: 'UserCheck', image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-FIN-05', name: 'Emerytura 2.0', description: 'Zrozumieć PPK, IKE i IKZE bez bólu głowy.', price: 36, type: ServiceType.ONE_TIME, icon: 'Landmark', image: 'https://images.unsplash.com/photo-1565514020176-6c2235b8b3a9?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-FIN-05', name: 'Emerytura 2.0', description: 'Zrozumieć PPK, IKE i IKZE bez bólu głowy.', price: 36, type: ServiceType.ONE_TIME, icon: 'Landmark', image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=800', isActive: true },
 
   // --- LIFESTYLE ---
   { id: 'SRV-LIFE-01', name: 'Bajka na dobranoc: Robot, który chciał mieć sny', description: 'Audio dla dzieci pracowników.', price: 11, type: ServiceType.ONE_TIME, icon: 'Baby', image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-LIFE-02', name: 'Kuchnia w 15 minut', description: 'Meal-prep dla zapracowanych.', price: 24, type: ServiceType.ONE_TIME, icon: 'Utensils', image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-LIFE-03', name: 'Hobby zamiast scrollowania', description: 'Jak znaleźć pasję, która nie wymaga ekranu.', price: 17, type: ServiceType.ONE_TIME, icon: 'Compass', image: 'https://images.unsplash.com/photo-1455355675860-e883e35ab3a7?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-LIFE-03', name: 'Hobby zamiast scrollowania', description: 'Jak znaleźć pasję, która nie wymaga ekranu.', price: 17, type: ServiceType.ONE_TIME, icon: 'Compass', image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-LIFE-04', name: 'Podróże z nielimitowanym urlopem', description: 'Jak planować workation.', price: 48, type: ServiceType.ONE_TIME, icon: 'Plane', image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-LIFE-05', name: 'Komunikacja między pokoleniami', description: 'Jak dogadać się z Gen Z i Boomerami.', price: 39, type: ServiceType.ONE_TIME, icon: 'Users', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800', isActive: true }
 ];
@@ -725,3 +733,4 @@ export const INITIAL_TICKETS: SupportTicket[] = [
         ]
     }
 ];
+

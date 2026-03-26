@@ -1,55 +1,49 @@
 import React, { useState } from 'react';
 import { ServiceItem } from '../../../types';
-import { Wifi, Smartphone, Heart, ArrowRight } from 'lucide-react';
-import { Button } from '../../ui/Button';
+import { Wifi, Smartphone, Heart, ArrowRight, Zap, Globe, Shield } from 'lucide-react';
 
 interface OrangeOfferSectionProps {
     services: ServiceItem[];
     onPurchase: (service: ServiceItem) => void;
 }
 
-type OrangeTab = 'ALL' | 'INTERNET' | 'ABONAMENT' | 'TV' | 'LOVE';
+type OrangeTab = 'ALL' | 'INTERNET' | 'ABONAMENT' | 'LOVE';
+
+const SERVICE_META: Record<string, { category: string; badge?: string; highlight?: boolean; icon: React.ReactNode; specs: string[]; extras?: string[] }> = {
+    'SRV-ORANGE-FIBER': {
+        category: 'Internet domowy',
+        badge: 'BESTSELLER',
+        icon: <Wifi size={22} />,
+        specs: ['do 600 Mb/s symetrycznie', 'Router Wi-Fi 6 w zestawie', 'Umowa na 24 miesiące'],
+        extras: ['Brak limitu danych', 'Instalacja w 48h'],
+    },
+    'SRV-ORANGE-GSM': {
+        category: 'Abonament komórkowy',
+        highlight: true,
+        icon: <Smartphone size={22} />,
+        specs: ['100 GB internetu mobilnego', '5G Ready', 'Umowa na 24 miesiące'],
+        extras: ['Rozmowy bez limitu', 'SMS/MMS bez limitu', 'Roaming UE', 'eSIM'],
+    },
+    'SRV-ORANGE-LOVE': {
+        category: 'Pakiet rodzinny',
+        badge: 'OSZCZĘDZASZ',
+        icon: <Heart size={22} />,
+        specs: ['Internet + komórka + TV', 'do 300 Mb/s', 'Umowa na 24 miesiące'],
+        extras: ['Cała rodzina w planie', 'Orange TV w pakiecie'],
+    },
+};
 
 export const OrangeOfferSection: React.FC<OrangeOfferSectionProps> = ({ services, onPurchase }) => {
     const [activeTab, setActiveTab] = useState<OrangeTab>('ALL');
 
-    // Filter only Orange services
-    // Fallback to hardcoded if not present in services prop (for redundancy)
     let orangeServices = services.filter(s => s.id.startsWith('SRV-ORANGE'));
     if (orangeServices.length === 0) {
         orangeServices = [
-          { 
-              id: 'SRV-ORANGE-FIBER', 
-              name: 'Światłowód Pro 2.0', 
-              description: 'Super szybki internet światłowodowy do Twojego domu.', 
-              price: 59, 
-              type: 'SUBSCRIPTION' as any, 
-              icon: 'Wifi' as any, 
-              isActive: true 
-          },
-          { 
-              id: 'SRV-ORANGE-GSM', 
-              name: 'Plan Firmowy L', 
-              description: 'Nielimitowane rozmowy i SMSy, duży pakiet danych.', 
-              price: 45, 
-              type: 'SUBSCRIPTION' as any, 
-              icon: 'Smartphone' as any, 
-              isActive: true 
-          },
-          { 
-              id: 'SRV-ORANGE-LOVE', 
-              name: 'Orange Love Mini', 
-              description: 'Pakiet usług dla całej rodziny w jednej cenie.', 
-              price: 89, 
-              type: 'SUBSCRIPTION' as any, 
-              icon: 'Heart' as any, 
-              isActive: true 
-          }
+            { id: 'SRV-ORANGE-FIBER', name: 'Światłowód Pro 2.0', description: 'Super szybki internet światłowodowy do Twojego domu.', price: 59, type: 'SUBSCRIPTION' as any, icon: 'Wifi' as any, isActive: true },
+            { id: 'SRV-ORANGE-GSM',   name: 'Plan Firmowy L',     description: 'Nielimitowane rozmowy i SMSy, duży pakiet danych.',       price: 45, type: 'SUBSCRIPTION' as any, icon: 'Smartphone' as any, isActive: true },
+            { id: 'SRV-ORANGE-LOVE',  name: 'Orange Love Mini',   description: 'Pakiet usług dla całej rodziny w jednej cenie.',           price: 89, type: 'SUBSCRIPTION' as any, icon: 'Heart' as any, isActive: true },
         ];
     }
-    
-    // Safety check just in case
-    if (!orangeServices) orangeServices = [];
 
     const filteredServices = orangeServices.filter(s => {
         if (activeTab === 'ALL') return true;
@@ -60,138 +54,193 @@ export const OrangeOfferSection: React.FC<OrangeOfferSectionProps> = ({ services
     });
 
     return (
-        <div className="rounded-2xl shadow-sm border border-slate-200 mb-8 font-sans overflow-hidden">
-            
-            {/* HERDER - BLACK */}
-            <div className="bg-black p-8 relative overflow-hidden">
-                {/* Ambient Background Glow */}
-                <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-orange-500/20 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div className="mb-8 font-sans">
+            {/* ── HERO HEADER ─────────────────────────────────────── */}
+            <div className="relative rounded-t-2xl overflow-hidden bg-[#FF6600]" style={{ minHeight: 180 }}>
+                {/* Decorative circles */}
+                <div className="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-white/10 pointer-events-none" />
+                <div className="absolute right-24 top-8 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
+                <div className="absolute -left-8 bottom-0 w-48 h-48 rounded-full bg-black/10 pointer-events-none" />
 
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end relative z-10 gap-4">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 bg-orange-500 flex items-center justify-center">
-                                <span className="text-black text-xs font-bold">TM</span>
-                            </div>
-                            <h2 className="text-3xl font-extrabold text-white tracking-tight">OFERTA <span className="text-orange-500">ORANGE</span></h2>
+                <div className="relative z-10 px-8 py-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    {/* Brand block */}
+                    <div className="flex items-center gap-5">
+                        {/* Orange wordmark box */}
+                        <div className="bg-white rounded-xl px-5 py-3 shadow-lg flex items-center gap-2 shrink-0">
+                            <div className="w-4 h-4 rounded-full bg-[#FF6600]" />
+                            <span className="text-[#FF6600] font-black text-xl tracking-tight leading-none">orange</span>
                         </div>
-                        <p className="text-base text-gray-400 max-w-xl">
-                            Specjalna oferta Orange dla pracowników Twojej firmy. <span className="text-orange-500 font-medium">Szybciej. Lepiej. Taniej.</span>
-                        </p>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-white font-black text-2xl md:text-3xl leading-none tracking-tight">Oferta dla pracowników</span>
+                            </div>
+                            <p className="text-white/80 text-sm font-medium">
+                                Ekskluzywne warunki negocjowane specjalnie dla Twojej firmy
+                            </p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="bg-orange-500 text-black text-xs font-bold px-3 py-1 uppercase tracking-wider">Exclusive</span>
-                        <span className="bg-gray-800 text-white text-xs font-bold px-3 py-1 uppercase tracking-wider">Pracownik</span>
+
+                    {/* Stats strip */}
+                    <div className="flex items-center gap-6 shrink-0">
+                        <div className="text-center">
+                            <div className="text-white font-black text-xl leading-none">do&nbsp;40%</div>
+                            <div className="text-white/70 text-xs mt-1">taniej niż cennik</div>
+                        </div>
+                        <div className="w-px h-10 bg-white/30" />
+                        <div className="text-center">
+                            <div className="text-white font-black text-xl leading-none">24/7</div>
+                            <div className="text-white/70 text-xs mt-1">wsparcie klienta</div>
+                        </div>
+                        <div className="w-px h-10 bg-white/30" />
+                        <div className="flex flex-col items-center">
+                            <span className="bg-white text-[#FF6600] text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest">Exclusive</span>
+                        </div>
                     </div>
                 </div>
+
+                {/* Bottom wave */}
+                <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 28" fill="none" preserveAspectRatio="none" style={{ height: 28 }}>
+                    <path d="M0 28 L0 14 Q360 0 720 14 Q1080 28 1440 14 L1440 28 Z" fill="white" />
+                </svg>
             </div>
 
-            {/* CONTENT - WHITE */}
-            <div className="bg-white p-8">
-                {/* Tabs - Minimalist */}
-                <div className="flex gap-6 mb-8 overflow-x-auto pb-2 border-b border-slate-100">
-                    {[
-                        { id: 'ALL', label: 'Wszystkie' },
-                        { id: 'INTERNET', label: 'Internet' },
+            {/* ── CONTENT AREA ────────────────────────────────────── */}
+            <div className="bg-white rounded-b-2xl border border-t-0 border-slate-200 shadow-sm px-8 pt-6 pb-8">
+                {/* Tabs */}
+                <div className="flex gap-1 mb-7 bg-slate-100 rounded-xl p-1 w-fit">
+                    {([
+                        { id: 'ALL',       label: 'Wszystkie' },
+                        { id: 'INTERNET',  label: 'Internet' },
                         { id: 'ABONAMENT', label: 'Abonamenty' },
-                        { id: 'LOVE', label: 'Pakiety Love' }
-                    ].map((tab) => (
+                        { id: 'LOVE',      label: 'Pakiety Love' },
+                    ] as { id: OrangeTab; label: string }[]).map(tab => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as OrangeTab)}
-                            className={`pb-4 text-sm font-bold transition-all whitespace-nowrap relative ${
-                                activeTab === tab.id 
-                                ? 'text-orange-500' 
-                                : 'text-slate-500 hover:text-black'
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                                activeTab === tab.id
+                                    ? 'bg-white text-[#FF6600] shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-800'
                             }`}
                         >
-                            {tab.label.toUpperCase()}
-                            {activeTab === tab.id && (
-                                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
-                            )}
+                            {tab.label}
                         </button>
                     ))}
                 </div>
 
-                {/* Cards Grid - ENTERPRISE ANIMATIONS */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {filteredServices.map(service => (
-                        <div key={service.id} className="group bg-white border border-slate-200 shadow-sm hover:shadow-[0_20px_50px_-12px_rgba(249,115,22,0.3)] hover:-translate-y-2 hover:border-orange-500 transition-all duration-500 ease-out flex flex-col relative h-full rounded-2xl overflow-hidden transform perspective-1000">
-                            
-                            {/* Top Orange Line Gradient */}
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                {/* Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {filteredServices.map(service => {
+                        const meta = SERVICE_META[service.id] ?? {
+                            category: 'Usługa', icon: <Globe size={22} />, specs: [], extras: [],
+                        };
+                        const isHighlighted = meta.highlight;
 
-                            <div className="p-8 flex-1 flex flex-col z-10 relative">
-                                {/* Card Header */}
-                                <div className="mb-6 relative">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 block group-hover:text-orange-500 transition-colors duration-300">
-                                        {service.name.includes('Światłowód') ? 'INTERNET DOMOWY' : 
-                                        service.name.includes('Plan') ? 'ABONAMENT KOMÓRKOWY' : 'OSZCZĘDZAJ W PAKIECIE'}
-                                    </span>
-                                    <h3 className="text-2xl font-bold text-slate-900 mb-2 leading-tight group-hover:text-black transition-colors">
-                                        {service.name}
-                                    </h3>
-                                    {/* Decorative Icon - Animated */}
-                                    <div className="absolute -top-4 -right-4 text-slate-100 transform scale-150 origin-top-right transition-all group-hover:text-orange-50 group-hover:scale-[1.75] group-hover:rotate-12 duration-700 pointer-events-none">
-                                        {service.name.includes('Światłowód') ? <Wifi size={80} /> : 
-                                        service.name.includes('Plan') ? <Smartphone size={80} /> : 
-                                        <Heart size={80} />}
+                        return (
+                            <div
+                                key={service.id}
+                                className={`group relative flex flex-col rounded-2xl transition-all duration-300 overflow-hidden ${
+                                    isHighlighted
+                                        ? 'shadow-[0_8px_40px_-8px_rgba(255,102,0,0.35)] border-2 border-[#FF6600] scale-[1.02]'
+                                        : 'border border-slate-200 hover:border-[#FF6600]/60 hover:shadow-[0_8px_32px_-8px_rgba(255,102,0,0.2)] hover:-translate-y-1'
+                                }`}
+                            >
+                                {/* Highlighted badge ribbon */}
+                                {isHighlighted && (
+                                    <div className="bg-[#FF6600] text-white text-[10px] font-black tracking-widest uppercase text-center py-1.5 px-4">
+                                        ★ Najpopularniejszy wybór
                                     </div>
-                                </div>
+                                )}
 
-                                {/* Features */}
-                                <div className="space-y-4 mb-8 flex-1">
-                                    <p className="text-slate-600 text-sm leading-relaxed border-l-2 border-slate-200 pl-4 group-hover:border-orange-500 transition-colors duration-300">
-                                        {service.description}
-                                    </p>
-
-                                    <div className="space-y-3 pt-2">
-                                        <div className="flex items-center gap-3 text-sm text-slate-600 group-hover:text-slate-900 transition-colors">
-                                            <Wifi size={18} className="text-slate-400 group-hover:text-orange-500 transition-colors" />
-                                            <span className="font-bold">
-                                                {service.name.includes('Światłowód') ? 'do 600 Mb/s' : 
-                                                 service.name.includes('Plan') ? 'Internet: 100 GB' : 
-                                                 'do 300 Mb/s'}
-                                            </span>
+                                <div className={`flex-1 flex flex-col p-6 ${isHighlighted ? 'bg-white' : 'bg-white'}`}>
+                                    {/* Card top */}
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{meta.category}</span>
+                                            <h3 className={`text-xl font-black mt-0.5 leading-tight ${isHighlighted ? 'text-[#FF6600]' : 'text-slate-900'}`}>
+                                                {service.name}
+                                            </h3>
                                         </div>
-                                        <div className="flex items-center gap-3 text-sm text-slate-600 group-hover:text-slate-900 transition-colors">
-                                            <div className="w-5 h-5 flex items-center justify-center bg-slate-100 text-slate-900 border border-slate-200 text-[10px] font-bold rounded group-hover:bg-orange-100 group-hover:text-orange-700 group-hover:border-orange-200 transition-all">24</div>
-                                            <span>Umowa na <span className="text-slate-900 font-bold">24 miesięcy</span></span>
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ml-3 ${
+                                            isHighlighted ? 'bg-[#FF6600] text-white' : 'bg-orange-50 text-[#FF6600]'
+                                        }`}>
+                                            {meta.icon}
                                         </div>
                                     </div>
-                                    
-                                    {/* Divider */}
-                                    <div className="h-px bg-slate-100 w-full group-hover:bg-orange-100 transition-colors duration-500"></div>
 
-                                    {service.name.includes('Plan') && (
-                                        <div className="text-xs text-slate-500 mt-4 grid grid-cols-2 gap-2">
-                                            <div className="flex items-center gap-1"><span className="text-orange-500">✓</span> Rozmowy bez limitu</div>
-                                            <div className="flex items-center gap-1"><span className="text-orange-500">✓</span> SMS/MMS bez limitu</div>
-                                            <div className="flex items-center gap-1"><span className="text-orange-500">✓</span> Roaming UE</div>
-                                            <div className="flex items-center gap-1"><span className="text-orange-500">✓</span> 5G Ready</div>
+                                    {/* Optional badge */}
+                                    {meta.badge && (
+                                        <span className="self-start text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-full bg-orange-50 text-[#FF6600] border border-orange-200 mb-4">
+                                            {meta.badge}
+                                        </span>
+                                    )}
+
+                                    {/* Description */}
+                                    <p className="text-slate-500 text-sm leading-relaxed mb-5">{service.description}</p>
+
+                                    {/* Specs */}
+                                    <ul className="space-y-2.5 mb-5 flex-1">
+                                        {meta.specs.map((spec, i) => (
+                                            <li key={i} className="flex items-center gap-2.5 text-sm text-slate-700">
+                                                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${isHighlighted ? 'bg-[#FF6600]' : 'bg-slate-400'}`} />
+                                                <span className="font-medium">{spec}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {/* Extras chips */}
+                                    {meta.extras && meta.extras.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5 mb-5">
+                                            {meta.extras.map((e, i) => (
+                                                <span key={i} className="text-[11px] font-semibold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">
+                                                    {e}
+                                                </span>
+                                            ))}
                                         </div>
                                     )}
-                                </div>
 
-                                {/* Price & Action */}
-                                <div className="mt-auto pt-4">
-                                    <div className="flex items-baseline gap-1 mb-6">
-                                        <span className="text-4xl font-extrabold text-slate-900 tracking-tighter group-hover:scale-105 transition-transform duration-300 origin-left block">{service.price}</span>
-                                        <span className="text-lg font-bold text-orange-600">pkt</span>
-                                        <span className="text-xs text-slate-400 ml-2 uppercase font-medium">/ miesięcznie</span>
+                                    {/* Divider */}
+                                    <div className="h-px bg-slate-100 mb-5" />
+
+                                    {/* Price row */}
+                                    <div className="flex items-end justify-between mb-4">
+                                        <div>
+                                            <div className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-0.5">Miesięcznie</div>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-4xl font-black text-slate-900 leading-none">{service.price}</span>
+                                                <span className="text-lg font-bold text-[#FF6600] leading-none">pkt</span>
+                                            </div>
+                                        </div>
+                                        {isHighlighted && (
+                                            <div className="text-right">
+                                                <div className="text-xs text-slate-400 line-through">99 pkt</div>
+                                                <div className="text-xs font-bold text-emerald-600">Oszczędzasz 54 pkt</div>
+                                            </div>
+                                        )}
                                     </div>
-                                    
-                                    <button 
+
+                                    {/* CTA */}
+                                    <button
                                         onClick={() => onPurchase(service)}
-                                        className="w-full bg-orange-500 text-black font-bold py-4 px-6 rounded-xl hover:bg-black hover:text-white transition-all duration-300 flex items-center justify-between group/btn shadow-lg shadow-orange-500/20 hover:shadow-xl hover:translate-x-1"
+                                        className={`w-full flex items-center justify-between font-black text-sm uppercase tracking-wider py-3.5 px-5 rounded-xl transition-all duration-200 ${
+                                            isHighlighted
+                                                ? 'bg-[#FF6600] text-white hover:bg-[#e05500] shadow-lg shadow-orange-500/30'
+                                                : 'bg-slate-900 text-white hover:bg-[#FF6600]'
+                                        }`}
                                     >
-                                        <span className="tracking-wide text-sm font-extrabold">WYBIERAM</span>
-                                        <ArrowRight size={20} className="transform group-hover/btn:translate-x-1 transition-transform" />
+                                        <span>Wybieram</span>
+                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
+                </div>
+
+                {/* Footer note */}
+                <div className="mt-6 flex items-center gap-2 text-xs text-slate-400">
+                    <Shield size={14} />
+                    <span>Oferta dostępna wyłącznie dla pracowników firm posiadających umowę korporacyjną z Orange Polska S.A. Ceny podane w punktach benefitowych.</span>
                 </div>
             </div>
         </div>

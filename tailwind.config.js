@@ -13,6 +13,19 @@ module.exports = {
         script: ['cursive'], // Fallback for signatures
       },
       colors: {
+        // BBS brand color — from the arrow in the Baltic Benefit logo
+        bbs: {
+          50:  '#f0f8fa',
+          100: '#d7eff3',
+          200: '#b3dfe8',
+          300: '#8bcbd5',
+          400: '#64abbd',
+          500: '#4a95a9',
+          600: '#3a7d8f',
+          700: '#2e6475',
+          800: '#1e4050',
+          900: '#0e2f4e',
+        },
         // Semantic aliases for existing colors
         primary: {
           50: '#ecfdf5',

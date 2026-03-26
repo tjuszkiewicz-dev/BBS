@@ -1,4 +1,4 @@
-# STRATTON PRIME: Eliton Benefits System (EBS)
+﻿# STRATTON PRIME: BBS (EBS)
 
 **Wersja:** 1.0.8 (Unified UI)  
 **Operator:** Stratton Prime S.A.
@@ -20,7 +20,7 @@
 
 ## 🌟 Opis Ogólny Systemu
 
-**Eliton Benefits System (EBS)** to zaawansowana platforma klasy Enterprise służąca do zarządzania cyfrowymi benefitami pracowniczymi. System automatyzuje proces zamawiania, dystrybucji i rozliczania voucherów, wykorzystując unikalny **Model Zaufania (Trust Model)**, który pozwala na przekazanie środków pracownikom jeszcze przed zaksięgowaniem płatności.
+**BBS (EBS)** to zaawansowana platforma klasy Enterprise służąca do zarządzania cyfrowymi benefitami pracowniczymi. System automatyzuje proces zamawiania, dystrybucji i rozliczania voucherów, wykorzystując unikalny **Model Zaufania (Trust Model)**, który pozwala na przekazanie środków pracownikom jeszcze przed zaksięgowaniem płatności.
 
 Główne filary systemu:
 *   **Optymalizacja Podatkowa:** Kalkulator płacowy "Net-First" (prognoza 2026) – automatyczny podział wynagrodzenia netto na gotówkę i vouchery.
@@ -226,3 +226,4 @@ A: Vouchery mają domyślną ważność 7 dni. Jeśli ich nie wykorzystasz, wyga
 
 **Q: Jak zmienić numer konta do wypłat?**  
 A: Wejdź w Ustawienia Profilu -> Wypłaty. Pamiętaj, że każda zmiana IBAN musi zostać zatwierdzona przez Administratora.
+

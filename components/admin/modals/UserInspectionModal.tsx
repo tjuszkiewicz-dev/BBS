@@ -1,4 +1,4 @@
-
+﻿
 import React, { useState, useEffect } from 'react';
 import { User, Company, BuybackAgreement } from '../../../types';
 import { X, Building2, CreditCard, ShieldCheck, History, User as UserIcon, AlertTriangle, Briefcase, Phone, Mail, ArrowRight, CheckCircle, XCircle, Edit2, Save, Ban, Clock, Send } from 'lucide-react';
@@ -70,7 +70,7 @@ export const UserInspectionModal: React.FC<UserInspectionModalProps> = ({
       const body = encodeURIComponent(
 `Dzień dobry,
 
-W systemie Eliton Benefits System (EBS) odnotowaliśmy wniosek o zmianę numeru konta bankowego do wypłat.
+W systemie BBS (EBS) odnotowaliśmy wniosek o zmianę numeru konta bankowego do wypłat.
 
 Ze względów bezpieczeństwa oraz procedur Compliance, proszę o potwierdzenie tej dyspozycji w odpowiedzi na ten e-mail lub kontakt telefoniczny.
 
@@ -390,3 +390,4 @@ Zespół Administratorów EBS`
     </div>
   );
 };
+

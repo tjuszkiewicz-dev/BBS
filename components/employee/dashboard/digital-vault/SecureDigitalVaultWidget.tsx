@@ -20,9 +20,9 @@ export const SecureDigitalVaultWidget: React.FC<Props> = ({ hasAccess = false, o
 
   return (
     <>
-      <div 
+      <div
         onClick={handleClick}
-        className={`relative overflow-hidden rounded-xl cursor-pointer group transition-all duration-300 hover:shadow-lg col-span-1 h-full min-h-[180px] border ${
+        className={`relative overflow-hidden rounded-3xl cursor-pointer group transition-all duration-300 hover:shadow-lg col-span-1 h-full min-h-[180px] border ${
             hasAccess 
               ? 'border-indigo-700/50 text-white' 
               : 'bg-white border-dashed border-slate-300 hover:border-indigo-400 hover:bg-slate-50'

@@ -297,7 +297,7 @@ const AppContent = () => {
   };
 
   return (
-    <div className={`flex h-screen font-sans ${currentUser.role === Role.EMPLOYEE ? 'bg-[#030712] text-white' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`flex h-screen font-sans bg-slate-50 text-slate-900`}>
       <ToastContainer toasts={toasts} removeToast={actions.removeToast} />
       <SessionGuard /> {/* GLOBAL SECURITY GUARD */}
       
@@ -319,34 +319,34 @@ const AppContent = () => {
           onLogout={actions.logout}
       />
 
-      <Sidebar 
-        currentUser={currentUser} 
+      <Sidebar
+        currentUser={currentUser}
         currentView={currentView}
         onChangeView={setCurrentView}
         isOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
         isDesktopOpen={isDesktopSidebarOpen} // Corrected: Pass boolean state, not setter
         onSwitchUser={actions.logout}
-        isLogout={true} 
+        isLogout={true}
       />
-      
-      <div className="flex-1 flex flex-col min-w-0 relative transition-all duration-300">
+
+      <div className={`flex-1 flex flex-col min-w-0 relative transition-all duration-300 ${isDesktopSidebarOpen ? 'md:ml-72' : 'md:ml-0'}`}>
         {/* Changed z-20 to z-40 to be above DashboardHR content (which uses z-30) */}
-        <header className={`h-16 md:h-20 flex items-center justify-between px-4 md:px-8 flex-shrink-0 z-40 relative border-b ${currentUser.role === Role.EMPLOYEE ? 'bg-[#030712]/80 backdrop-blur-xl border-white/10' : 'bg-white border-slate-200'}`}>
+        <header className="h-16 md:h-20 flex items-center justify-between px-4 md:px-8 flex-shrink-0 z-40 relative border-b bg-white border-slate-200">
           <div className="flex items-center gap-4">
             <button
               onClick={handleToggleSidebar}
-              className={`p-2 -ml-2 rounded-lg transition ${currentUser.role === Role.EMPLOYEE ? 'text-slate-300 hover:bg-white/10' : 'text-slate-600 hover:bg-slate-100'}`}
+              className="p-2 -ml-2 rounded-lg transition text-slate-600 hover:bg-slate-100"
             >
               <Menu size={24} />
             </button>
             <div>
-              <h2 className={`text-lg font-bold hidden sm:block ${currentUser.role === Role.EMPLOYEE ? 'text-white' : 'text-slate-800'}`}>
+              <h2 className="text-lg font-bold hidden sm:block text-slate-800">
                 {currentUser.role === Role.SUPERADMIN ? 'Panel Administracyjny' :
                  currentUser.role === Role.HR ? 'Zarządzanie Kadrami' :
                  currentUser.role === Role.EMPLOYEE ? 'Strefa Pracownika' : 'Strefa Partnera'}
               </h2>
-              <p className={`text-xs hidden sm:block ${currentUser.role === Role.EMPLOYEE ? 'text-slate-400' : 'text-slate-500'}`}>
+              <p className="text-xs hidden sm:block text-slate-500">
                 {companies.find(c => c.id === currentUser.companyId)?.name || 'Platforma Centralna'}
               </p>
             </div>
@@ -383,7 +383,7 @@ const AppContent = () => {
             {/* Search Trigger Button */}
             <button
                 onClick={() => setIsSearchOpen(true)}
-                className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs cursor-pointer transition mr-2 ${currentUser.role === Role.EMPLOYEE ? 'bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10' : 'bg-slate-50 border border-slate-200 text-slate-400 hover:bg-slate-100 hover:border-slate-300'}`}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs cursor-pointer transition mr-2 bg-slate-50 border border-slate-200 text-slate-400 hover:bg-slate-100 hover:border-slate-300"
                 title="Szukaj (Ctrl+K)"
             >
                 <Search size={14} />
@@ -408,28 +408,28 @@ const AppContent = () => {
             />
             
             <button
-                title="Ustawienia" onClick={() => setIsSettingsOpen(true)} className={`p-2 rounded-full transition relative group ${currentUser.role === Role.EMPLOYEE ? 'text-slate-400 hover:bg-white/10' : 'text-slate-500 hover:bg-slate-100'}`}
+                title="Ustawienia" onClick={() => setIsSettingsOpen(true)} className="p-2 rounded-full transition relative group text-slate-500 hover:bg-slate-100"
             >
                 <Settings size={20} />
             </button>
 
             <button
                onClick={actions.logout}
-               className={`hidden md:flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full border transition group ${currentUser.role === Role.EMPLOYEE ? 'border-white/10 bg-white/5 hover:border-red-500/40 hover:bg-red-500/10' : 'border-slate-200 bg-white hover:border-red-200 hover:bg-red-50'}`}
+               className="hidden md:flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full border transition group border-slate-200 bg-white hover:border-red-200 hover:bg-red-50"
                title="Wyloguj się"
             >
                <div className="text-right hidden lg:block">
-                  <p className={`text-xs font-bold group-hover:text-red-400 ${currentUser.role === Role.EMPLOYEE ? 'text-slate-200' : 'text-slate-700 group-hover:text-red-700'}`}>{currentUser.name}</p>
-                  <p className={`text-xs uppercase ${currentUser.role === Role.EMPLOYEE ? 'text-slate-500' : 'text-slate-400'}`}>{currentUser.role}</p>
+                  <p className="text-xs font-bold text-slate-700 group-hover:text-red-700">{currentUser.name}</p>
+                  <p className="text-xs uppercase text-slate-400">{currentUser.role}</p>
                </div>
-               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold border transition ${currentUser.role === Role.EMPLOYEE ? 'bg-white/10 text-slate-200 border-white/10 group-hover:bg-red-500 group-hover:text-white' : 'bg-slate-100 text-slate-600 border-slate-100 group-hover:bg-red-500 group-hover:text-white'}`}>
+               <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold border transition bg-bbs-500 text-white border-bbs-500 group-hover:bg-red-500 group-hover:border-red-500">
                   {currentUser.name.charAt(0)}
                </div>
             </button>
           </div>
         </header>
 
-        <main id="main-scroll-container" className={`flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth ${currentUser.role === Role.EMPLOYEE ? 'bg-transparent' : 'bg-slate-50/50'}`}>
+        <main id="main-scroll-container" className="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth bg-slate-50/50">
            <div className="max-w-7xl mx-auto">
               {renderContent()}
            </div>

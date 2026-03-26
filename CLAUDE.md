@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -19,7 +19,7 @@ npx jest services/payrollService.test.ts   # Run payroll service unit tests
 
 ## Architecture
 
-**STRATTON PRIME: Eliton Benefits System (EBS)** — enterprise benefits management platform with role-based portals.
+**STRATTON PRIME: BBS (EBS)** — enterprise benefits management platform with role-based portals.
 
 ### State Management
 
@@ -57,3 +57,4 @@ All shared TypeScript interfaces are in `types.ts`. Roles: `SUPERADMIN`, `HR`, `
 ### Path Aliases
 
 `@/` maps to the repository root (configured in `tsconfig.json` and `vite.config.ts`).
+

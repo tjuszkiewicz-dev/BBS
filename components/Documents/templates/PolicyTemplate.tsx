@@ -1,4 +1,4 @@
-
+﻿
 import React from 'react';
 import { DocumentTemplate, Company } from '../../../types';
 import { PDF_LAYOUT } from '../PDF_LAYOUT';
@@ -40,9 +40,10 @@ export const PolicyTemplate: React.FC<Props> = ({ data, company }) => {
 
         {/* Footer */}
         <div className="mt-auto pt-6 border-t border-gray-300 text-center text-[8pt] text-gray-400">
-            Dokument pobrany z platformy Eliton Benefits System (EBS).<br/>
+            Dokument pobrany z platformy BBS (EBS).<br/>
             Obowiązuje od dnia publikacji w systemie.
         </div>
     </div>
   );
 };
+

@@ -1,245 +1,338 @@
-import React, { useState } from 'react';
-import { Car, Home, Plane, Heart, Stethoscope, GraduationCap, ArrowRight, ShieldCheck } from 'lucide-react';
-import { Button } from '../../ui/Button';
+﻿import React, { useState } from 'react';
+import { Car, Home, Plane, Stethoscope, GraduationCap, ArrowRight, CheckCircle2, Shield, Users, Award } from 'lucide-react';
 
 interface PZUServiceSectionProps {
     onCheckOffer: (category: string) => void;
 }
 
-type PZUTab = 'OC/AC' | 'DOM' | 'WOJAŻER' | 'ZDROWIE' | 'EDUKACJA';
+type PZUTab = 'OC_AC' | 'DOM' | 'PODROZE' | 'ZDROWIE' | 'EDUKACJA';
+
+const PZU_RED = '#C8102E';
+const PZU_LIGHT = '#FBEAEA';
+
+interface TabMeta {
+    id: PZUTab;
+    label: string;
+    icon: React.ReactNode;
+    accentColor: string;
+    image: string;
+    hero: string;
+    heroSub: string;
+    features: string[];
+    priceFrom: number;
+    cta: string;
+    ctaUrl?: string;
+    badgeText?: string;
+}
+
+const TABS: TabMeta[] = [
+    {
+        id: 'OC_AC',
+        label: 'OC / AC',
+        icon: <Car size={18} />,
+        accentColor: PZU_RED,
+        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=900',
+        hero: 'Ubezpieczenie samochodu OC/AC',
+        heroSub: 'Kompleksowa ochrona pojazdu z asystą drogową przez całą dobę.',
+        features: [
+            'OC — obowiązkowe ubezpieczenie komunikacyjne',
+            'AC — ochrona własnego pojazdu od szkód',
+            'Assistance Comfort: pomoc 24/7 w trasie',
+            'NNW kierowcy i pasażerów',
+            'Szyby — wymiana bez udziału własnego',
+            'Zniżka do 30% dla pracowników objętych BBS',
+        ],
+        priceFrom: 38,
+        cta: 'Oblicz składkę',
+        ctaUrl: 'https://moje.pzu.pl/pzu/motor-survey',
+        badgeText: 'Nr 1 w Polsce',
+    },
+    {
+        id: 'DOM',
+        label: 'Dom i Mieszkanie',
+        icon: <Home size={18} />,
+        accentColor: '#1e40af',
+        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=900',
+        hero: 'Ubezpiecz swój dom lub mieszkanie',
+        heroSub: 'Ochrona mienia, odpowiedzialność cywilna i assistance mieszkaniowy.',
+        features: [
+            'Mury i stała zabudowa od zdarzeń losowych',
+            'Wyposażenie: zalanie, pożar, kradzież',
+            'OC w życiu prywatnym',
+            'Assistance mieszkaniowy — hydraulik, elektryk 24/7',
+            'Ubezpieczenie domku letniskowego w pakiecie',
+            'Zniżka pracownicza do 25%',
+        ],
+        priceFrom: 25,
+        cta: 'Sprawdź ofertę',
+        ctaUrl: 'https://moje.pzu.pl/pzu/property-survey?cna=house',
+    },
+    {
+        id: 'PODROZE',
+        label: 'Podróże',
+        icon: <Plane size={18} />,
+        accentColor: '#0369a1',
+        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=900',
+        hero: 'PZU Wojażer — bezpieczne podróże',
+        heroSub: 'Ochrona kosztów leczenia i assistance za granicą przez cały rok.',
+        features: [
+            'Koszty leczenia i hospitalizacji za granicą',
+            'Assistance: transport medyczny, repatriacja',
+            'Bagaż i dokumenty — kradzież i zagubienie',
+            'OC w podróży zagranicznej',
+            'Opóźnienie i odwołanie lotu',
+            'Wersja roczna — bez limitu podróży',
+        ],
+        priceFrom: 12,
+        cta: 'Sprawdź ofertę',
+        ctaUrl: 'https://moje.pzu.pl/pzu/travel/policy-details',
+    },
+    {
+        id: 'ZDROWIE',
+        label: 'Zdrowie',
+        icon: <Stethoscope size={18} />,
+        accentColor: '#047857',
+        image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=900',
+        hero: 'PZU Zdrowie — prywatna opieka medyczna',
+        heroSub: 'Szybki dostęp do specjalistów bez kolejki. Wygoda i bezpieczeństwo zdrowotne.',
+        features: [
+            'Konsultacje lekarskie online 24/7',
+            'Specjaliści bez skierowania',
+            'Badania diagnostyczne i laboratoria',
+            'Pakiet stomatologiczny — przegląd + leczenie',
+            'Teleporady z pediatrą dla dzieci',
+            'Pakiet onkologiczny w wyższych wariantach',
+        ],
+        priceFrom: 69,
+        cta: 'Sprawdź pakiety',
+        ctaUrl: 'https://moje.pzu.pl/sales/package-subscription/list',
+        badgeText: 'Popularne',
+    },
+    {
+        id: 'EDUKACJA',
+        label: 'Edukacja',
+        icon: <GraduationCap size={18} />,
+        accentColor: '#7c3aed',
+        image: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&q=80&w=900',
+        hero: 'NNW Szkolne i studenckie',
+        heroSub: 'Ochrona na wypadek nieszczęśliwych wypadków dzieci i młodzieży uczącej się.',
+        features: [
+            'Trwały uszczerbek na zdrowiu (NNW)',
+            'Śmierć ubezpieczonego w wyniku NNW',
+            'Koszty leczenia po wypadku',
+            'Assistance medyczny — transport do szpitala',
+            'Ochrona podczas zajęć sportowych i wycieczek',
+            'Możliwość objęcia współmałżonka pracownika',
+        ],
+        priceFrom: 9,
+        cta: 'Sprawdź ofertę',
+        ctaUrl: 'https://moje.pzu.pl/sales/generic/education',
+    },
+];
 
 export const PZUServiceSection: React.FC<PZUServiceSectionProps> = ({ onCheckOffer }) => {
-    const [activeTab, setActiveTab] = useState<PZUTab>('OC/AC');
+    const [activeTab, setActiveTab] = useState<PZUTab>('OC_AC');
+    const [plateInput, setPlateInput] = useState('');
 
-    const renderHeroContent = () => {
-        switch (activeTab) {
-            case 'OC/AC':
-                return {
-                    title: 'Sprawdź ofertę ubezpieczenia OC/AC',
-                    desc: 'Podaj numer rejestracyjny i poznaj cenę w 3 minuty.',
-                    icon: <Car size={64} className="text-blue-100" />,
-                    color: 'bg-blue-600'
-                };
-            case 'DOM':
-                return {
-                    title: 'Ubezpiecz swój dom lub mieszkanie',
-                    desc: 'Chroń swój majątek od zdarzeń losowych i kradzieży.',
-                    icon: <Home size={64} className="text-blue-100" />,
-                    color: 'bg-indigo-600'
-                };
-            case 'WOJAŻER':
-                return {
-                    title: 'Bezpieczne podróże małe i duże',
-                    desc: 'Koszty leczenia i assistance w podróży zagranicznej.',
-                    icon: <Plane size={64} className="text-blue-100" />,
-                    color: 'bg-sky-600'
-                };
-            case 'ZDROWIE':
-                return {
-                    title: 'Zadbaj o zdrowie swoje i bliskich',
-                    desc: 'Pakiety medyczne i wsparcie w razie choroby.',
-                    icon: <Stethoscope size={64} className="text-blue-100" />,
-                    color: 'bg-teal-600'
-                };
-            case 'EDUKACJA':
-                return {
-                    title: 'Bezpieczna szkoła i studia',
-                    desc: 'Ubezpieczenie NNW dla dzieci i młodzieży uczącej się.',
-                    icon: <GraduationCap size={64} className="text-blue-100" />,
-                    color: 'bg-rose-600'
-                };
-            default:
-                return { title: '', desc: '', icon: null, color: '' };
-        }
-    };
-
-    const hero = renderHeroContent();
+    const tab = TABS.find(t => t.id === activeTab)!;
 
     return (
-        <div className="bg-white px-6 pb-6 pt-2 rounded-2xl shadow-sm border border-slate-100 mb-8 overflow-hidden relative">
-            {/* Background Decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-60"></div>
+        <div className="rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
 
-            {/* Header */}
-            <div className="flex justify-between items-start mb-6 relative z-10">
-                <div>
-                    <div className="flex items-center gap-0 mb-0 -mt-4">
-                        <img 
-                            src="https://www.pbd.org.pl/wp-content/uploads/2019/02/pzu.png" 
-                            alt="PZU" 
-                            className="w-32 h-32 object-contain -ml-2"
-                        />
-                        <h2 className="text-xl font-bold text-slate-800 -ml-2">Ubezpieczenia PZU</h2>
+            {/* HERO HEADER */}
+            <div className="relative p-8 overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b2e 55%, #1e0a10 100%)' }}>
+                <div className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(200,16,46,0.25) 0%, transparent 70%)', transform: 'translate(30%, -40%)' }} />
+                <div className="absolute bottom-0 left-0 w-72 h-72 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(200,16,46,0.1) 0%, transparent 70%)', transform: 'translate(-30%, 40%)' }} />
+                <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: 'linear-gradient(to bottom, #C8102E, #8B0000)' }} />
+
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pl-4">
+                    <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
+                            <img
+                                src="https://www.pbd.org.pl/wp-content/uploads/2019/02/pzu.png"
+                                alt="PZU"
+                                className="w-full h-full object-contain"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                                    if (fallback) fallback.classList.remove('hidden');
+                                }}
+                            />
+                            <Shield className="hidden" size={32} style={{ color: PZU_RED }} />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider" style={{ background: PZU_RED }}>
+                                    Benefity pracownicze
+                                </span>
+                                <span className="text-white/60 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-white/20">
+                                    Platforma BBS
+                                </span>
+                            </div>
+                            <h2 className="text-3xl font-extrabold text-white tracking-tight">
+                                Ubezpieczenia <span style={{ color: '#f87171' }}>PZU</span>
+                            </h2>
+                            <p className="text-white/60 text-sm mt-0.5">Specjalne zniżki pracownicze — do 40% taniej niż w cenniku</p>
+                        </div>
                     </div>
-                    <p className="text-sm text-slate-500 mt-[-10px]">Specjalne zniżki pracownicze na pakiety ubezpieczeń.</p>
+
+                    <div className="flex items-center gap-6">
+                        <div className="text-center">
+                            <div className="flex items-center gap-1.5 text-white">
+                                <Users size={16} className="text-white/50" />
+                                <span className="text-xl font-bold">16 mln+</span>
+                            </div>
+                            <span className="text-white/50 text-[11px] uppercase font-semibold tracking-wide">Klientów</span>
+                        </div>
+                        <div className="w-px h-10 bg-white/20" />
+                        <div className="text-center">
+                            <div className="flex items-center gap-1.5 text-white">
+                                <Award size={16} className="text-white/50" />
+                                <span className="text-xl font-bold">100+</span>
+                            </div>
+                            <span className="text-white/50 text-[11px] uppercase font-semibold tracking-wide">Lat tradycji</span>
+                        </div>
+                        <div className="w-px h-10 bg-white/20" />
+                        <div className="text-center">
+                            <div className="text-xl font-bold text-white">do 40%</div>
+                            <span className="text-white/50 text-[11px] uppercase font-semibold tracking-wide">Taniej</span>
+                        </div>
+                    </div>
                 </div>
-                <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">PARTNER</span>
             </div>
 
-             {/* BLUE SEPARATOR LINE */}
-             <div className="h-0.5 bg-blue-600 mb-6 rounded-full opacity-80 shadow-[0_0_10px_rgba(37,99,235,0.1)] relative z-10"></div>
+            {/* CONTENT AREA */}
+            <div className="bg-white px-6 md:px-8 pt-6 pb-8">
 
-            {/* Main Tabs */}
-            <div className="flex gap-1 mb-6 border-b border-slate-100 relative z-10">
-                {(['OC/AC', 'DOM', 'WOJAŻER', 'ZDROWIE', 'EDUKACJA'] as PZUTab[]).map((tab) => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-6 py-3 text-sm font-bold border-b-2 transition-colors ${
-                            activeTab === tab 
-                            ? 'border-blue-600 text-blue-600' 
-                            : 'border-transparent text-slate-500 hover:text-slate-700'
-                        }`}
-                    >
-                        {tab}
-                    </button>
-                ))}
-            </div>
+                {/* Pill tabs */}
+                <div className="flex gap-1.5 mb-7 bg-slate-100 rounded-xl p-1 w-fit flex-wrap">
+                    {TABS.map(t => (
+                        <button
+                            key={t.id}
+                            onClick={() => setActiveTab(t.id)}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap"
+                            style={activeTab === t.id
+                                ? { background: t.accentColor, color: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }
+                                : { color: '#64748b' }
+                            }
+                        >
+                            {t.icon} {t.label}
+                        </button>
+                    ))}
+                </div>
 
-            {/* Hero Card */}
-            <div className={`rounded-xl p-8 mb-8 text-white relative overflow-hidden transition-colors duration-500 ${hero.color}`}>
-                <div className="absolute right-0 top-0 h-full w-1/2 bg-white/10 skew-x-12 transform origin-bottom translate-x-12"></div>
-                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="max-w-md">
-                        <h3 className="text-2xl font-bold mb-2">{hero.title}</h3>
-                        <p className="text-blue-100 mb-6">{hero.desc}</p>
-                        
-                        {activeTab === 'OC/AC' && (
-                            <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm mb-4 border border-white/20">
-                                <label className="text-xs text-blue-200 block mb-1">Numer rejestracyjny</label>
-                                <div className="flex gap-2">
-                                    <input 
-                                        type="text" 
-                                        placeholder="KR 12345" 
-                                        className="bg-white text-slate-800 px-3 py-2 rounded font-bold w-32 uppercase focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    />
-                                    <button 
-                                        onClick={() => onCheckOffer(activeTab)}
-                                        className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold px-4 py-2 rounded transition-colors whitespace-nowrap"
-                                    >
-                                        OBLICZ SKŁADKĘ
-                                    </button>
+                {/* Active tab offer card */}
+                <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-8 flex flex-col md:flex-row min-h-[280px]">
+
+                    {/* Left: offer info */}
+                    <div className="flex-1 p-7 flex flex-col justify-between">
+                        <div>
+                            {tab.badgeText && (
+                                <span className="inline-block text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-full mb-3"
+                                    style={{ background: PZU_LIGHT, color: PZU_RED, border: `1px solid ${PZU_RED}40` }}>
+                                    ★ {tab.badgeText}
+                                </span>
+                            )}
+                            <h3 className="text-2xl font-extrabold text-slate-800 mb-1">{tab.hero}</h3>
+                            <p className="text-slate-500 text-sm mb-5 leading-relaxed">{tab.heroSub}</p>
+
+                            <ul className="space-y-2 mb-6">
+                                {tab.features.map((f, i) => (
+                                    <li key={i} className="flex items-center gap-2.5 text-sm text-slate-700">
+                                        <CheckCircle2 size={15} className="flex-shrink-0" style={{ color: tab.accentColor }} />
+                                        {f}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* CTA block */}
+                        <div className="flex items-end justify-between gap-4 flex-wrap">
+                            <div>
+                                <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Cena pracownicza od</span>
+                                <div className="flex items-baseline gap-1 mt-0.5">
+                                    <span className="text-4xl font-black text-slate-800">{tab.priceFrom}</span>
+                                    <span className="text-lg font-bold text-slate-400">pkt</span>
+                                    <span className="text-sm text-slate-400 ml-1">/ miesiąc</span>
                                 </div>
                             </div>
-                        )}
 
-                        {activeTab !== 'OC/AC' && (
-                             <button 
-                                onClick={() => onCheckOffer(activeTab)}
-                                className="bg-white text-slate-900 font-bold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors shadow-lg"
-                            >
-                                SPRAWDŹ OFERTĘ
-                            </button>
-                        )}
+                            <div className="flex gap-3 flex-wrap items-center">
+                                {activeTab === 'OC_AC' && (
+                                    <div className="flex gap-2 items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                        <input
+                                            type="text"
+                                            placeholder="np. KR 12345"
+                                            value={plateInput}
+                                            onChange={e => setPlateInput(e.target.value.toUpperCase())}
+                                            maxLength={10}
+                                            className="bg-transparent text-slate-800 font-bold text-sm uppercase w-28 focus:outline-none placeholder:font-normal placeholder:text-slate-400"
+                                        />
+                                        <button
+                                            onClick={() => tab.ctaUrl ? window.open(tab.ctaUrl, '_blank') : onCheckOffer(tab.id)}
+                                            className="text-white text-xs font-bold px-4 py-2 rounded-lg transition-opacity hover:opacity-90 whitespace-nowrap"
+                                            style={{ background: '#ca8a04' }}
+                                        >
+                                            OBLICZ SKŁADKĘ
+                                        </button>
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => tab.ctaUrl ? window.open(tab.ctaUrl, '_blank') : onCheckOffer(tab.id)}
+                                    className="flex items-center gap-2 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all hover:opacity-90 shadow-md"
+                                    style={{ background: tab.accentColor }}
+                                >
+                                    {tab.cta}
+                                    <ArrowRight size={16} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div className="hidden md:block opacity-90 transform scale-110 min-w-[400px] flex justify-end">
-                        {activeTab === 'OC/AC' && (
-                            <div className="w-[400px] h-[250px] relative rounded-lg overflow-hidden shadow-2xl skew-x-12 border-4 border-white/20">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&q=80&w=800" 
-                                    alt="Samochód" 
-                                    className="w-full h-full object-cover -skew-x-12 scale-125"
-                                />
-                                <div className="absolute inset-0 bg-blue-900/10 mix-blend-overlay -skew-x-12"></div>
-                            </div>
-                        )}
-                        
-                        {activeTab === 'DOM' && (
-                             <div className="w-[400px] h-[250px] relative rounded-lg overflow-hidden shadow-2xl skew-x-12 border-4 border-white/20">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800" 
-                                    alt="Nowoczesny Dom" 
-                                    className="w-full h-full object-cover -skew-x-12 scale-125"
-                                />
-                                <div className="absolute inset-0 bg-indigo-900/10 mix-blend-overlay -skew-x-12"></div>
-                            </div>
-                        )}
 
-                        {activeTab === 'WOJAŻER' && (
-                             <div className="w-[400px] h-[250px] relative rounded-lg overflow-hidden shadow-2xl skew-x-12 border-4 border-white/20">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=800" 
-                                    alt="Podróże" 
-                                    className="w-full h-full object-cover -skew-x-12 scale-125"
-                                />
-                                <div className="absolute inset-0 bg-sky-900/10 mix-blend-overlay -skew-x-12"></div>
-                            </div>
-                        )}
-
-                        {activeTab === 'ZDROWIE' && (
-                             <div className="w-[400px] h-[250px] relative rounded-lg overflow-hidden shadow-2xl skew-x-12 border-4 border-white/20">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=800" 
-                                    alt="Zdrowie" 
-                                    className="w-full h-full object-cover -skew-x-12 scale-125"
-                                />
-                                <div className="absolute inset-0 bg-teal-900/10 mix-blend-overlay -skew-x-12"></div>
-                            </div>
-                        )}
-
-                        {activeTab === 'EDUKACJA' && (
-                             <div className="w-[400px] h-[250px] relative rounded-lg overflow-hidden shadow-2xl skew-x-12 border-4 border-white/20">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=800" 
-                                    alt="Edukacja" 
-                                    className="w-full h-full object-cover -skew-x-12 scale-125"
-                                />
-                                <div className="absolute inset-0 bg-rose-900/10 mix-blend-overlay -skew-x-12"></div>
-                            </div>
-                        )}
-
-                        {activeTab !== 'OC/AC' && activeTab !== 'DOM' && activeTab !== 'WOJAŻER' && activeTab !== 'ZDROWIE' && activeTab !== 'EDUKACJA' && (
-                            <div className="pr-12">
-                                {hero.icon}
-                            </div>
-                        )}
+                    {/* Right: category image */}
+                    <div className="hidden md:block relative w-[360px] shrink-0 overflow-hidden">
+                        <img
+                            src={tab.image}
+                            alt={tab.label}
+                            className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.55) 0%, transparent 40%)' }} />
                     </div>
                 </div>
-            </div>
 
-            <h4 className="font-bold text-slate-800 mb-4 px-1 text-lg">Szybki Wybór Ubezpieczenia</h4>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {[
-                    { label: 'Mój Samochód', desc: 'OC/AC/NNW', icon: <Car size={28}/>, id: 'OC/AC', gradient: 'from-blue-500 to-blue-600' },
-                    { label: 'Mój Dom', desc: 'Majątek i OC', icon: <Home size={28}/>, id: 'DOM', url: 'https://moje.pzu.pl/pzu/property-survey?cna=house&mcid=p_pzu_pl&cid=sg_fastform_dom&_gl=1*1ln8a9c*_gcl_aw*R0NMLjE3NzE1MDAwODYuQ2owS0NRaUFodHZNQmhEQkFSSXNBTDI2cGpFS2oxQ01SSkUzaXEyZTI5cW9OcHFrSUFhV05KbFk0N01aX29jTzduekhWSU5SLUxQZ1l5MGFBdEQyRUFMd193Y0I.*_gcl_dc*R0NMLjE3NzE1MDAwODYuQ2owS0NRaUFodHZNQmhEQkFSSXNBTDI2cGpFS2oxQ01SSkUzaXEyZTI5cW9OcHFrSUFhV05KbFk0N01aX29jTzduekhWSU5SLUxQZ1l5MGFBdEQyRUFMd193Y0I.*_gcl_au*ODQwNTIyOTE4LjE3NzE1MDAwMTU.', gradient: 'from-indigo-500 to-indigo-600' },
-                    { label: 'Podróże', desc: 'Polska i Świat', icon: <Plane size={28}/>, id: 'WOJAŻER', url: 'https://moje.pzu.pl/pzu/travel/policy-details?mcid=p_pzu_pl&cid=sg_fastform_travel&direction=POLAND&_gl=1*1arqxhp*_gcl_aw*R0NMLjE3NzE1MDA1MzcuQ2owS0NRaUFodHZNQmhEQkFSSXNBTDI2cGpFS2oxQ01SSkUzaXEyZTI5cW9OcHFrSUFhV05KbFk0N01aX29jTzduekhWSU5SLUxQZ1l5MGFBdEQyRUFMd193Y0I.*_gcl_dc*R0NMLjE3NzE1MDA1MzcuQ2owS0NRaUFodHZNQmhEQkFSSXNBTDI2cGpFS2oxQ01SSkUzaXEyZTI5cW9OcHFrSUFhV05KbFk0N01aX29jTzduekhWSU5SLUxQZ1l5MGFBdEQyRUFMd193Y0I.*_gcl_au*ODQwNTIyOTE4LjE3NzE1MDAwMTU.&processId=pakenc_SkqUvByma7_UdaSEzMOt2dGY9iccc6LoHgXM6ILMpbCjvh2H3i97n-Ypp3_c6VSSrFn5aGtm', gradient: 'from-sky-500 to-sky-600' },
-                    { label: 'Zdrowie', desc: 'Pakiety Medyczne', icon: <Stethoscope size={28}/>, id: 'ZDROWIE', url: 'https://moje.pzu.pl/sales/package-subscription/list', gradient: 'from-teal-500 to-teal-600' },
-                    { label: 'Edukacja', desc: 'NNW Szkolne', icon: <GraduationCap size={28}/>, id: 'SZKOLA', url: 'https://moje.pzu.pl/sales/generic/education?mcid=mp_mpz', gradient: 'from-rose-500 to-rose-600' }
-                ].map((item) => (
-                    <div 
-                        key={item.label}
-                        onClick={() => item.url ? window.open(item.url, '_blank') : onCheckOffer(item.id)}
-                        className="relative bg-white border border-slate-100 rounded-2xl p-5 hover:border-blue-300 hover:shadow-2xl hover:-translate-y-1.5 cursor-pointer transition-all duration-300 group flex flex-col items-start justify-between min-h-[160px] overflow-visible"
-                    >
-                         {/* Glow Underneath */}
-                         <div className={`absolute -bottom-4 left-4 right-4 h-4 bg-gradient-to-r ${item.gradient} rounded-[100%] blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-300 -z-10`}></div>
+                {/* QUICK PICK TILES */}
+                <h4 className="font-bold text-slate-500 mb-4 text-xs uppercase tracking-widest">Szybki wybór kategorii</h4>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {TABS.map(t => {
+                        const isActive = activeTab === t.id;
+                        return (
+                            <button
+                                key={t.id}
+                                onClick={() => setActiveTab(t.id)}
+                                className="relative group flex flex-col items-start p-4 rounded-2xl transition-all duration-200 text-left overflow-hidden"
+                                style={isActive
+                                    ? { border: `2px solid ${t.accentColor}`, background: `${t.accentColor}12` }
+                                    : { border: '2px solid #e2e8f0', background: '#fff' }
+                                }
+                            >
+                                <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-transform duration-200 group-hover:scale-110"
+                                    style={{ background: isActive ? t.accentColor : '#f1f5f9', color: isActive ? '#fff' : t.accentColor }}
+                                >
+                                    {t.icon}
+                                </div>
+                                <span className="font-bold text-slate-800 text-sm leading-tight">{t.label}</span>
+                                {isActive && (
+                                    <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full" style={{ background: t.accentColor }} />
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
 
-                        {/* Top Animated Bar */}
-                        <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${item.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left z-20 rounded-t-2xl`}></div>
-
-                        {/* Background Decoration */}
-                        <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${item.gradient} rounded-bl-full opacity-5 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                        
-                        {/* Icon Container */}
-                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.gradient} text-white flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 mb-4`}>
-                            {item.icon}
-                        </div>
-
-                        {/* Text Content */}
-                        <div className="z-10 w-full">
-                            <h5 className="font-bold text-slate-800 text-lg group-hover:text-blue-700 transition-colors">{item.label}</h5>
-                            <p className="text-xs text-slate-400 group-hover:text-slate-500 transition-colors mt-1">{item.desc}</p>
-                        </div>
-
-                        {/* Hover Action */}
-                        <div className="absolute bottom-5 right-5 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                             <div className={`w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600`}>
-                                <ArrowRight size={16} />
-                             </div>
-                        </div>
-                    </div>
-                ))}
+                <p className="text-center text-xs text-slate-400 mt-6">
+                    Ubezpieczenia PZU oferowane są na warunkach grupowego zakupu pracowniczego. Ceny poglądowe — ostateczna oferta zależy od danych pojazdu/nieruchomości. Zakup wymaga akceptacji OWU PZU SA.
+                </p>
             </div>
         </div>
     );

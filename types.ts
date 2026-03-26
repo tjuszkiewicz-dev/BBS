@@ -236,7 +236,11 @@ export interface User {
   termsAcceptedAt?: string;
   termsAcceptedMethod?: 'MANUAL' | 'BULK_IMPORT';
   anonymizedAt?: string; // NEW: Compliance
-  
+
+  // Auth credentials (demo)
+  username?: string;
+  password?: string;
+
   // Security
   isTwoFactorEnabled?: boolean; // NEW: 2FA
 }

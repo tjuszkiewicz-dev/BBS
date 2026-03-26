@@ -1,4 +1,4 @@
-
+﻿
 import React, { useCallback } from 'react';
 import { Order, OrderStatus, Company, User, Voucher, VoucherStatus, Role, Commission, CommissionType, PayrollEntry, PayrollSnapshot, DistributionBatch, SystemConfig } from '../../types';
 import { INITIAL_ORDERS, INITIAL_COMPANIES, INITIAL_COMMISSIONS } from '../../services/mockData';
@@ -25,7 +25,7 @@ const MOCK_CRM_PAYLOAD = [
         address_street: 'Magazynowa 4', 
         address_city: 'Poznań', 
         address_zip: '60-001',
-        manager_email: 'adam.d@eliton-benefits.com' 
+        manager_email: 'adam.d@bbs-benefits.com' 
     },
     { 
         crm_id: 'CRM-1002', 
@@ -44,7 +44,7 @@ const MOCK_CRM_PAYLOAD = [
         address_street: 'Słoneczna 15', 
         address_city: 'Gdańsk', 
         address_zip: '80-001',
-        manager_email: 'marek.m@eliton-benefits.com' 
+        manager_email: 'marek.m@bbs-benefits.com' 
     }
 ];
 
@@ -420,3 +420,4 @@ export const useOrderLogic = (
       handleCrmSync
   };
 };
+

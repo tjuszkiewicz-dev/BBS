@@ -73,12 +73,10 @@ export const ServiceCatalog: React.FC<ServiceCatalogProps> = ({ services, userBa
                 >
                     {/* Background: Image or Graphic */}
                     {service.image ? (
-                        <div className="absolute inset-0 z-0">
-                            <img 
-                                src={service.image} 
-                                alt={service.name} 
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                            />
+                        <div
+                            className="absolute inset-0 z-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style={{ backgroundImage: `url('${service.image}')` }}
+                        >
                             {/* Gradient Overlay for Readability */}
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent opacity-95 group-hover:opacity-90 transition-opacity"></div>
                         </div>

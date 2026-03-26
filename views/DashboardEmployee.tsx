@@ -1,5 +1,4 @@
-
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+﻿import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { User, Voucher, VoucherStatus, BuybackAgreement, ServiceItem, Transaction, UserFinance, ServiceType } from '../types';
 import { ServiceCatalog } from '../components/employee/dashboard/ServiceCatalog';
 import { EmployeeTransactionHistory } from '../components/employee/dashboard/EmployeeTransactionHistory';
@@ -18,7 +17,9 @@ import { MarketplaceHero } from '../components/employee/dashboard/marketplace/Ma
 import { ElitonBanner } from '../components/employee/dashboard/marketplace/ElitonBanner';
 import { OrangeOfferSection } from '../components/employee/dashboard/OrangeOfferSection';
 import { PZUServiceSection } from '../components/employee/dashboard/PZUServiceSection';
-import { Wallet, History, Settings, HelpCircle, Grid, Heart, Lock, Brain, ArrowRight, Scale, ShieldCheck, X } from 'lucide-react';
+import { ErgoHestiaServiceSection } from '../components/employee/dashboard/ErgoHestiaServiceSection';
+import { LuxMedServiceSection } from '../components/employee/dashboard/LuxMedServiceSection';
+import { Wallet, History, Settings, HelpCircle, Grid, Heart, Lock, Brain, ArrowRight, Scale, ShieldCheck, X, ShoppingCart } from 'lucide-react';
 import { useStrattonSystem } from '../context/StrattonContext';
 import { PageHeader } from '../components/layout/PageHeader';
 import { Tabs } from '../components/ui/Tabs';
@@ -67,8 +68,6 @@ export const DashboardEmployee: React.FC<Props> = ({
 
   // --- SYNC WITH PARENT & SCROLL LOGIC ---
   useEffect(() => {
-    // 1. Sync activeTab if changed externally via Sidebar/Props
-    // Only process if we are not actively scrolling
     const scrollContainer = document.getElementById('main-scroll-container') || window;
 
     if (currentView === 'emp-history') {
@@ -84,12 +83,10 @@ export const DashboardEmployee: React.FC<Props> = ({
         scrollContainer.scrollTo({ top: 0, behavior: 'auto' });
     }
     else if (currentView === 'emp-catalog') {
-        // Just ensure we are in the "Long Page" mode.
         if (activeTab !== 'CATALOG') {
             setActiveTab('CATALOG');
         }
 
-        // If NOT scrolling manually (i.e. clicked from sidebar), scroll to anchor.
         if (!isScrollingRef.current) {
              setTimeout(() => {
                  const element = document.getElementById('catalog-anchor');
@@ -107,7 +104,6 @@ export const DashboardEmployee: React.FC<Props> = ({
              setActiveTab('WALLET');
         }
         
-        // Scroll to top if clicked explicitly (not via spy)
         if (!isScrollingRef.current) {
             scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -117,12 +113,10 @@ export const DashboardEmployee: React.FC<Props> = ({
   // --- SCROLL SPY ---
   useEffect(() => {
     const handleScroll = () => {
-        // Only trigger Spy logic if we are in the main "Long Page" mode (Wallet + Catalog)
         if (activeTab === 'HISTORY' || activeTab === 'SUPPORT' || activeTab === 'WELLBEING' || activeTab === 'LEGAL' || activeTab === 'ACTIVE_SERVICES') return;
 
         isScrollingRef.current = true;
         
-        // Use timeout to reset scrolling flag
         if ((window as any).scrollTimeout) clearTimeout((window as any).scrollTimeout);
         (window as any).scrollTimeout = setTimeout(() => { isScrollingRef.current = false; }, 150);
 
@@ -131,11 +125,6 @@ export const DashboardEmployee: React.FC<Props> = ({
 
         const rect = catalogAnchor.getBoundingClientRect();
         
-        // LOGIC REFINEMENT:
-        // We want the sidebar to switch to "Catalog" as soon as the Catalog section dominates the screen.
-        // If the anchor (header) is above the bottom 1/3rd of screen, we are effectively "in" the catalog.
-        // Using window.innerHeight * 0.8 is aggressive but ensures earlier switch.
-        
         const threshold = window.innerHeight * 0.8; 
         const isCatalogActive = rect.top < threshold; 
 
@@ -143,12 +132,10 @@ export const DashboardEmployee: React.FC<Props> = ({
             onViewChange('emp-catalog');
         } 
         else if (!isCatalogActive && currentView !== 'emp-dashboard') {
-             // If we scroll UP and the catalog header pushes near bottom or off screen, switch to dashboard
              onViewChange('emp-dashboard');
         }
     };
 
-    // ATTACH TO MAIN SCROLL CONTAINER IF EXISTS, ELSE WINDOW
     const scrollContainer = document.getElementById('main-scroll-container') || window;
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
     
@@ -156,11 +143,10 @@ export const DashboardEmployee: React.FC<Props> = ({
         scrollContainer.removeEventListener('scroll', handleScroll);
         if ((window as any).scrollTimeout) clearTimeout((window as any).scrollTimeout);
     };
-  }, [activeTab, currentView]); // Needs currentView to prevent infinite loops
+  }, [activeTab, currentView]);
 
   // Rest of logic...
   const activeVouchers = useMemo(() => vouchers.filter(v => v.status === VoucherStatus.DISTRIBUTED || v.status === VoucherStatus.RESERVED), [vouchers]);
-  
   
   const expiringSoon = activeVouchers.filter(v => {
     if(!v.expiryDate) return false;
@@ -185,22 +171,21 @@ export const DashboardEmployee: React.FC<Props> = ({
     return transactions.some(t => t.serviceId === 'SRV-VAULT-01');
   }, [transactions]);
 
-  // Filter Catalog (Hide Purchased Subscriptions)
+  // Filter Catalog
   const displayServices = useMemo(() => {
       return services.filter(s => {
           if (s.id === 'SRV-MENTAL-01' && hasMentalHealthAccess) return false;
           if (s.id === 'SRV-LEGAL-01' && hasLegalAccess) return false;
           if (s.id === 'SRV-SECURE-01' && hasSecureMessengerAccess) return false;
           if (s.id === 'SRV-VAULT-01' && hasVaultAccess) return false;
-          if (s.id.startsWith('SRV-ORANGE')) return false; // Hide Orange services from generic catalog
+          if (s.id.startsWith('SRV-ORANGE')) return false; 
           return true;
       });
   }, [services, hasMentalHealthAccess, hasLegalAccess, hasSecureMessengerAccess, hasVaultAccess]);
 
-  // Identify Services for Quick Purchase
   const wellbeingService = useMemo(() => services.find(s => s.id === 'SRV-MENTAL-01'), [services]);
   const legalService = useMemo(() => services.find(s => s.id === 'SRV-LEGAL-01'), [services]);
-  // Mock secure messenger service if not in DB yet
+  
   const secureMessengerService = useMemo(() => {
       const existing = services.find(s => s.id === 'SRV-SECURE-01');
       if (existing) return existing;
@@ -236,7 +221,6 @@ export const DashboardEmployee: React.FC<Props> = ({
   };
 
   const handleManualSpend = async (amount: number, description: string) => {
-      // Manual spend for internal app features (pay-per-use inside app)
       const tempService: ServiceItem = {
           id: `INTERNAL-${Date.now()}`,
           name: description,
@@ -249,175 +233,107 @@ export const DashboardEmployee: React.FC<Props> = ({
       onPurchaseService(tempService);
   };
 
-  // --- RENDERING SUB-VIEWS ---
-
   const renderWallet = () => (
       <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
           
-          {/* MOBILE: Wallet Card */}
           <div className="md:hidden">
               <WalletCard user={user} />
           </div>
 
-          {/* MARKETPLACE GRID REMOVED PER USER REQUEST */}
-
-
-          {/* APPS GRID */}
-          <div className="pt-8 pb-12" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="pt-8 pb-12 border-t border-slate-200">
              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xl font-bold tracking-tight ebs-grad-text">Twoje Narzędzia</h3>
-                <span className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider hidden md:block" style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)' }}>
-                   Zarządzane przez Eliton
+                <h3 className="text-2xl font-bold tracking-tight text-slate-800">Twoje Narzędzia</h3>
+                <span className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider hidden md:block bg-emerald-50 text-emerald-600 border border-emerald-200">
+                   Zarządzane przez BBS
                 </span>
              </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 md:gap-8">
               
-              {/* WELLBEING APP */}
-              {hasMentalHealthAccess ? (
-                  <div 
-                    onClick={() => setActiveTab('WELLBEING')}
-                    className="group relative cursor-pointer hover:-translate-y-1.5 transition-all duration-300 z-0 h-full"
-                  >
-                      {/* Glow Underneath */}
-                      <div className="absolute -bottom-6 left-4 right-4 h-6 bg-indigo-600 rounded-[100%] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 -z-10"></div>
-
-                      <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-lg border border-indigo-700 h-full flex flex-col justify-between">
-                          {/* Background Image & Overlay */}
-                          <div className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-700" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1000)' }}></div>
-                          <div className="absolute inset-0 bg-indigo-900/80 backdrop-blur-[2px] group-hover:bg-indigo-900/70 transition-colors"></div>
-
-                          <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 skew-x-12 transform origin-bottom"></div>
-                          <div className="relative z-10 flex justify-between items-center h-full">
-                              <div>
-                                  <div className="flex items-center gap-2 mb-2">
-                                      <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider">
-                                          Dostęp Aktywny
-                                      </span>
-                                  </div>
-                                  <h3 className="text-xl font-bold flex items-center gap-2">
-                                      <Brain className="text-indigo-300" size={24}/> Wellbeing
-                                  </h3>
-                                  <p className="text-indigo-200 text-sm mt-1 max-w-sm">
-                                      Twoje centrum zdrowia psychicznego. AI Coach, medytacje i sesje deep work.
-                                  </p>
-                              </div>
-                          </div>
+              <div
+                onClick={() => setActiveTab('WELLBEING')}
+                className="relative overflow-hidden rounded-3xl cursor-pointer group transition-all duration-300 hover:shadow-xl h-full min-h-[180px] border border-teal-700/50"
+              >
+                <div className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-700" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=1000)' }} />
+                <div className="absolute inset-0 bg-teal-950/80 backdrop-blur-[2px] group-hover:bg-teal-950/70 transition-colors" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <div className="relative p-5 h-full flex flex-col justify-between z-10">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30 uppercase animate-pulse">
+                        Dostęp Aktywny
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-teal-300 transition-colors flex items-center gap-2 leading-tight">
+                      <Brain className="w-4 h-4" /> Wellbeing
+                    </h3>
+                    <p className="text-slate-400 text-xs leading-relaxed max-w-[90%]">
+                      Twoje centrum zdrowia psychicznego. AI Coach, medytacje i sesje deep work.
+                    </p>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="flex -space-x-1">
+                      <div className="w-7 h-7 rounded-full bg-teal-900/50 border-2 border-slate-700 flex items-center justify-center text-xs text-teal-400 shadow-sm z-20">
+                        <Heart size={12} />
                       </div>
-                  </div>
-              ) : (
-                  <div 
-                    onClick={() => wellbeingService && setSelectedService(wellbeingService)}
-                    className="group relative cursor-pointer hover:-translate-y-1.5 transition-all duration-300 z-0 h-full"
-                  >
-                        {/* Glow Underneath */}
-                      <div className="absolute -bottom-6 left-4 right-4 h-6 bg-indigo-400 rounded-[100%] blur-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
-
-                     <div className="relative overflow-hidden rounded-2xl p-6 transition-all h-full flex flex-col justify-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(99,102,241,0.4)' }}>
-                        <div className="flex justify-between items-center w-full">
-                            <div className="flex items-start gap-4">
-                                <div className="p-3 rounded-xl group-hover:scale-110 transition-transform" style={{ background: 'rgba(99,102,241,0.2)', color: '#818cf8' }}>
-                                    <Heart size={24} className="fill-current"/>
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: 'white' }}>
-                                        Wellbeing
-                                        <Lock size={14} style={{ color: 'rgba(255,255,255,0.4)' }}/>
-                                    </h3>
-                                    <p className="text-sm mt-1 max-w-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                                        Zadbaj o swój spokój. AI Terapeuta i redukcja stresu.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <span className="block text-xl font-bold" style={{ color: '#60a5fa' }}>100 pkt</span>
-                                <span className="text-xs uppercase font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Msc</span>
-                            </div>
-                        </div>
-                     </div>
-                  </div>
-              )}
-
-              {/* LEGAL APP */}
-              {hasLegalAccess ? (
-                  <div 
-                    onClick={() => setActiveTab('LEGAL')}
-                    className="group relative cursor-pointer hover:-translate-y-1.5 transition-all duration-300 z-0 h-full"
-                  >
-                      {/* Glow Underneath */}
-                      <div className="absolute -bottom-6 left-4 right-4 h-6 bg-slate-900 rounded-[100%] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 -z-10"></div>
-
-                      <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-lg border border-slate-700 h-full flex flex-col justify-between">
-                          {/* Background Image & Overlay */}
-                          <div className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-700" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1000)' }}></div>
-                          <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-[1px] group-hover:bg-slate-900/80 transition-colors"></div>
-
-                          <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 -skew-x-12 transform origin-top"></div>
-                          <div className="relative z-10 flex justify-between items-center h-full">
-                              <div>
-                                  <div className="flex items-center gap-2 mb-2">
-                                      <span className="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30 uppercase tracking-wider">
-                                          Legalny Spokój
-                                      </span>
-                                  </div>
-                                  <h3 className="text-xl font-bold flex items-center gap-2">
-                                      <Scale className="text-amber-300" size={24}/> AI Prawnik
-                                  </h3>
-                                  <p className="text-slate-300 text-sm mt-1 max-w-sm">
-                                      Analiza umów, generator pism i porady prawne 24/7.
-                                  </p>
-                              </div>
-                              <div className="bg-white/10 p-3 rounded-full group-hover:bg-white/20 transition-colors">
-                                  <ArrowRight size={24} className="text-white"/>
-                              </div>
-                          </div>
+                      <div className="w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs text-white shadow-sm z-10">
+                        <Brain size={12} />
                       </div>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-teal-500 flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 group-hover:border-teal-400 transform group-hover:translate-x-1">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
-              ) : (
-                  <div 
-                    onClick={() => legalService && setSelectedService(legalService)}
-                    className="group relative cursor-pointer hover:-translate-y-1.5 transition-all duration-300 z-0 h-full"
-                  >
-                      {/* Glow Underneath */}
-                      <div className="absolute -bottom-6 left-4 right-4 h-6 bg-slate-400 rounded-[100%] blur-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
+                </div>
+              </div>
 
-                      <div className="relative overflow-hidden rounded-2xl p-6 transition-all h-full flex flex-col justify-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(99,102,241,0.4)' }}>
-                          <div className="flex justify-between items-center w-full">
-                              <div className="flex items-start gap-4">
-                                  <div className="p-3 rounded-xl group-hover:scale-110 transition-transform" style={{ background: 'rgba(99,102,241,0.2)', color: '#818cf8' }}>
-                                      <ShieldCheck size={24} />
-                                  </div>
-                                  <div>
-                                      <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: 'white' }}>
-                                          AI Legal Assistant
-                                          <Lock size={14} style={{ color: 'rgba(255,255,255,0.4)' }}/>
-                                      </h3>
-                                      <p className="text-sm mt-1 max-w-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                                          Twój osobisty prawnik. Analiza umów i pism w 60 sekund.
-                                      </p>
-                                  </div>
-                              </div>
-                              <div className="text-right">
-                                  <span className="block text-xl font-bold" style={{ color: '#60a5fa' }}>150 pkt</span>
-                                  <span className="text-xs uppercase font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>Msc</span>
-                              </div>
-                          </div>
+              <div
+                onClick={() => setActiveTab('LEGAL')}
+                className="relative overflow-hidden rounded-3xl cursor-pointer group transition-all duration-300 hover:shadow-xl h-full min-h-[180px] border border-amber-700/50"
+              >
+                <div className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-700" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=1000)' }} />
+                <div className="absolute inset-0 bg-amber-950/80 backdrop-blur-[2px] group-hover:bg-amber-950/70 transition-colors" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <div className="relative p-5 h-full flex flex-col justify-between z-10">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase animate-pulse">
+                        Legalny Spokój
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-300 transition-colors flex items-center gap-2 leading-tight">
+                      <Scale className="w-4 h-4" /> AI Prawnik
+                    </h3>
+                    <p className="text-slate-400 text-xs leading-relaxed max-w-[90%]">
+                      Analiza umów, generator pism i porady prawne 24/7.
+                    </p>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="flex -space-x-1">
+                      <div className="w-7 h-7 rounded-full bg-amber-900/50 border-2 border-slate-700 flex items-center justify-center text-xs text-amber-400 shadow-sm z-20">
+                        <Scale size={12} />
                       </div>
+                      <div className="w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-xs text-white shadow-sm z-10">
+                        <ShieldCheck size={12} />
+                      </div>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-amber-500 flex items-center justify-center transition-all duration-300 shadow-lg border border-white/10 group-hover:border-amber-400 transform group-hover:translate-x-1">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
-              )}
+                </div>
+              </div>
 
-              {/* SECURE MESSENGER APP */}
-              <div className="h-full col-span-1 md:col-span-2 lg:col-span-1">
+              <div className="h-full">
                 <SecureMessengerWidget 
-                    hasAccess={hasSecureMessengerAccess}
+                    hasAccess={true}
                     price={200}
                     onPurchase={() => setSelectedService(secureMessengerService)}
               />
               </div>
 
-              {/* SECURE DIGITAL VAULT APP */}
-              <div className="h-full col-span-1 md:col-span-2 lg:col-span-1">
+              <div className="h-full">
               <SecureDigitalVaultWidget 
-                hasAccess={hasVaultAccess}
+                hasAccess={true}
                 price={50}
                 onPurchase={() => setSelectedService(vaultService)}
               />
@@ -426,11 +342,10 @@ export const DashboardEmployee: React.FC<Props> = ({
           </div>
           </div>
 
-          {/* ORANGE OFFER SECTION */}
-          <div className="pt-12 pb-12" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="pt-12 pb-12 border-t border-slate-200">
              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-xl font-bold tracking-tight ebs-grad-text">Strefa Partnerów</h3>
-                 <span className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider" style={{ background: 'rgba(249,115,22,0.15)', color: '#fb923c', border: '1px solid rgba(249,115,22,0.3)' }}>
+                <h3 className="text-2xl font-bold tracking-tight text-slate-800">Strefa Partnerów</h3>
+                 <span className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-orange-50 text-orange-500 border border-orange-200">
                    Oferty Specjalne
                 </span>
              </div>
@@ -455,13 +370,39 @@ export const DashboardEmployee: React.FC<Props> = ({
                         setSelectedService(tempService);
                     }}
                 />
+                <ErgoHestiaServiceSection
+                    onSelectPackage={(packageName, price) => {
+                        const tempService: ServiceItem = {
+                            id: `ERGOHESTIA-${packageName.replace(/\s/g, '_')}`,
+                            name: packageName,
+                            description: `Grupowe ubezpieczenie ERGO Hestia. Aktywacja w ciągu 2 dni roboczych. Kliknij „Zatwierdź”, aby zamówić pakiet.`,
+                            price,
+                            type: ServiceType.SUBSCRIPTION,
+                            icon: 'Shield',
+                            isActive: true
+                        };
+                        setSelectedService(tempService);
+                    }}
+                />
+                <LuxMedServiceSection
+                    onSelectPackage={(packageName, price) => {
+                        const tempService: ServiceItem = {
+                            id: `LUXMED-${packageName.replace(/\s/g, '_')}`,
+                            name: packageName,
+                            description: `Prywatny pakiet medyczny LuxMed. Aktywacja w ciągu 24h. Kliknij "Zatwierdź", aby zamówić pakiet.`,
+                            price,
+                            type: ServiceType.SUBSCRIPTION,
+                            icon: 'Heart',
+                            isActive: true
+                        };
+                        setSelectedService(tempService);
+                    }}
+                />
              </div>
           </div>
 
           <ElitonBanner />
 
-
-          {/* Catalog Preview (Mobile Only - Full View is separate tab) */}
           <div className="md:hidden">
               <div className="flex justify-between items-center mb-4">
                   <h3 className="font-bold text-slate-800">Polecane Usługi</h3>
@@ -469,8 +410,8 @@ export const DashboardEmployee: React.FC<Props> = ({
               </div>
               <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                   {displayServices.slice(0, 4).map(s => (
-                      <div key={s.id} onClick={() => setSelectedService(s)} className="min-w-[140px] bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
-                          <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-xl mb-2">🎁</div>
+                      <div key={s.id} onClick={() => setSelectedService(s)} className="min-w-[140px] bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center active:scale-95 transition-transform">
+                          <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-xl mb-2">🎁</div>
                           <p className="text-xs font-bold text-slate-700 leading-tight line-clamp-2 h-8">{s.name}</p>
                           <p className="text-emerald-600 font-bold text-sm mt-1">{s.price} pkt</p>
                       </div>
@@ -478,22 +419,21 @@ export const DashboardEmployee: React.FC<Props> = ({
               </div>
           </div>
 
-          {/* Recent History (Mobile Only) */}
           <div className="md:hidden">
               <h3 className="font-bold text-slate-800 mb-4">Ostatnie Transakcje</h3>
               <div className="space-y-3">
                   {transactions.slice(0, 3).map(t => (
-                      <div key={t.id} className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-50 shadow-sm">
+                      <div key={t.id} className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                           <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'CREDIT' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600'}`}>
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'CREDIT' ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600'}`}>
                                   {t.type === 'CREDIT' ? '+' : '-'}
                               </div>
                               <div>
-                                  <p className="text-xs font-bold text-slate-700">{t.serviceName || 'Doładowanie'}</p>
-                                  <p className="text-[10px] text-slate-400">{new Date(t.date).toLocaleDateString()}</p>
+                                  <p className="text-sm font-bold text-slate-800">{t.serviceName || 'Doładowanie'}</p>
+                                  <p className="text-xs text-slate-500">{new Date(t.date).toLocaleDateString()}</p>
                               </div>
                           </div>
-                          <span className={`text-sm font-bold ${t.type === 'CREDIT' ? 'text-emerald-600' : 'text-slate-800'}`}>
+                          <span className={`text-base font-bold ${t.type === 'CREDIT' ? 'text-emerald-600' : 'text-slate-800'}`}>
                               {t.type === 'CREDIT' ? '+' : '-'}{t.amount}
                           </span>
                       </div>
@@ -503,7 +443,6 @@ export const DashboardEmployee: React.FC<Props> = ({
       </div>
   );
 
-  // If in Wellbeing Mode, render the full screen app
   if (activeTab === 'WELLBEING' && hasMentalHealthAccess) {
       return (
           <MentalHealthDashboard 
@@ -515,7 +454,6 @@ export const DashboardEmployee: React.FC<Props> = ({
       );
   }
 
-  // If in Legal Mode, render the full screen app
   if (activeTab === 'LEGAL' && hasLegalAccess) {
       return (
           <LegalAssistantDashboard 
@@ -527,14 +465,12 @@ export const DashboardEmployee: React.FC<Props> = ({
       );
   }
 
-  // If in Secure Messenger Mode, render the full screen app
   if (activeTab === 'SECURE_MESSENGER' && hasSecureMessengerAccess) {
       return (
           <div className="fixed inset-0 bg-slate-50 z-[100] overflow-hidden flex flex-col font-sans text-slate-900">
-              {/* Minimal Top Bar */}
               <div className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shrink-0 z-50">
                   <div className="flex items-center gap-2">
-                      <div className="bg-emerald-600 text-white p-1.5 rounded-lg">
+                      <div className="bg-emerald-600 text-white p-1.5 rounded-xl">
                           <Lock size={18}/>
                       </div>
                       <span className="font-bold tracking-tight text-slate-900">STRATTON <span className="text-emerald-600">SECURE</span></span>
@@ -544,7 +480,6 @@ export const DashboardEmployee: React.FC<Props> = ({
                   </button>
               </div>
 
-              {/* Content Area */}
               <div className="flex-1 overflow-y-auto relative bg-[#f8fafc]">
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full">
                       <SecureMessengerWidget
@@ -556,14 +491,12 @@ export const DashboardEmployee: React.FC<Props> = ({
       );
   }
 
-  // If in Secure Vault Mode, render the full screen app
   if (activeTab === 'DIGITAL_VAULT' && hasVaultAccess) {
       return (
           <div className="fixed inset-0 bg-slate-50 z-[100] overflow-hidden flex flex-col font-sans text-slate-900">
-              {/* Minimal Top Bar */}
               <div className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shrink-0 z-50 shadow-sm relative">
                   <div className="flex items-center gap-2">
-                      <div className="bg-indigo-600 text-white p-1.5 rounded-lg">
+                      <div className="bg-indigo-600 text-white p-1.5 rounded-xl">
                           <ShieldCheck size={18}/>
                       </div>
                       <span className="font-bold tracking-tight text-slate-900">DIGITAL <span className="text-indigo-600">VAULT</span></span>
@@ -573,7 +506,6 @@ export const DashboardEmployee: React.FC<Props> = ({
                   </button>
               </div>
 
-              {/* Content Area - Full height minus header */}
               <div className="flex-1 overflow-hidden relative bg-[#f8fafc]">
                   <DigitalVaultApp 
                       onClose={() => setActiveTab('WALLET')}
@@ -588,33 +520,31 @@ export const DashboardEmployee: React.FC<Props> = ({
 
       return (
           <div className="space-y-8 animate-in fade-in duration-500">
-              {/* Header */}
-              <div className="rounded-3xl p-8 md:p-12 relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)', backdropFilter: 'blur(22px)' }}>
-                  <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-20 -mt-20 opacity-20" style={{ background: '#10b981' }}></div>
+              <div className="rounded-3xl p-8 md:p-12 relative overflow-hidden bg-white shadow-sm border border-slate-200">
+                  <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-20 -mt-20 opacity-20 bg-emerald-300"></div>
                   <div className="relative z-10 max-w-2xl">
-                      <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight" style={{ color: 'white' }}>
+                      <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight text-slate-800">
                           Witaj w swoim katalogu <br/>
-                          <span style={{ color: '#10b981' }}>aktywnych usług</span>
+                          <span className="text-emerald-600">aktywnych usług</span>
                       </h2>
-                      <p className="text-lg leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                      <p className="text-lg leading-relaxed text-slate-500">
                           Dziękujemy że skorzystałeś z naszych możliwości i życzymy miłego użytkowania.
                       </p>
                   </div>
               </div>
 
-              {/* Grid */}
               {activeCount === 0 ? (
-                  <div className="text-center py-20 rounded-3xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)' }}>
-                      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
+                  <div className="text-center py-20 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200">
+                      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-white shadow-sm text-slate-400">
                           <Grid size={32} />
                       </div>
-                      <h3 className="text-lg font-bold mb-2" style={{ color: 'white' }}>Brak aktywnych usług</h3>
-                      <p className="max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                      <h3 className="text-lg font-bold mb-2 text-slate-800">Brak aktywnych usług</h3>
+                      <p className="max-w-md mx-auto text-slate-500">
                           Nie aktywowałeś jeszcze żadnych usług. Przejdź do katalogu, aby wykorzystać swoje punkty.
                       </p>
                       <Button 
                           variant="primary" 
-                          className="mt-6"
+                          className="mt-6 bg-emerald-600 hover:bg-emerald-700 text-white"
                           onClick={() => {
                               setActiveTab('CATALOG');
                               if (onViewChange) onViewChange('emp-catalog');
@@ -630,22 +560,21 @@ export const DashboardEmployee: React.FC<Props> = ({
                             onClick={() => setActiveTab('WELLBEING')}
                             className="group relative cursor-pointer hover:-translate-y-1.5 transition-all duration-300 z-0 h-full min-h-[240px]"
                           >
-                              <div className="absolute -bottom-6 left-4 right-4 h-6 bg-indigo-600 rounded-[100%] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 -z-10"></div>
-                              <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-lg border border-indigo-700 h-full flex flex-col justify-between">
+                              <div className="absolute -bottom-6 left-4 right-4 h-6 bg-blue-300 rounded-full blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-300 -z-10"></div>
+                              <div className="relative overflow-hidden rounded-3xl p-6 text-white shadow-sm border border-slate-200 bg-white h-full flex flex-col justify-between">
                                   <div className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-700" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=1000)' }}></div>
-                                  <div className="absolute inset-0 bg-indigo-900/80 backdrop-blur-[2px] group-hover:bg-indigo-900/70 transition-colors"></div>
-                                  <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 skew-x-12 transform origin-bottom"></div>
+                                  <div className="absolute inset-0 bg-white group-hover:bg-slate-50 transition-colors"></div>
                                   <div className="relative z-10 flex justify-between items-center h-full">
                                       <div>
                                           <div className="flex items-center gap-2 mb-2">
-                                              <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider">
+                                              <span className="bg-emerald-100 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-wider">
                                                   Dostęp Aktywny
                                               </span>
                                           </div>
-                                          <h3 className="text-xl font-bold flex items-center gap-2">
-                                              <Brain className="text-indigo-300" size={24}/> Wellbeing
+                                          <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800">
+                                              <Brain className="text-blue-500" size={24}/> Wellbeing
                                           </h3>
-                                          <p className="text-indigo-200 text-sm mt-1 max-w-sm">
+                                          <p className="text-slate-500 text-sm mt-1 max-w-sm">
                                               Twoje centrum zdrowia psychicznego. AI Coach, medytacje i sesje deep work.
                                           </p>
                                       </div>
@@ -659,27 +588,26 @@ export const DashboardEmployee: React.FC<Props> = ({
                             onClick={() => setActiveTab('LEGAL')}
                             className="group relative cursor-pointer hover:-translate-y-1.5 transition-all duration-300 z-0 h-full min-h-[240px]"
                           >
-                              <div className="absolute -bottom-6 left-4 right-4 h-6 bg-slate-900 rounded-[100%] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 -z-10"></div>
-                              <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-lg border border-slate-700 h-full flex flex-col justify-between">
+                              <div className="absolute -bottom-6 left-4 right-4 h-6 bg-amber-300 rounded-full blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-300 -z-10"></div>
+                              <div className="relative overflow-hidden rounded-3xl p-6 text-white shadow-sm border border-slate-200 bg-white h-full flex flex-col justify-between">
                                   <div className="absolute inset-0 bg-cover bg-center transform group-hover:scale-105 transition-transform duration-700" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1000)' }}></div>
-                                  <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-[1px] group-hover:bg-slate-900/80 transition-colors"></div>
-                                  <div className="absolute right-0 top-0 h-full w-1/3 bg-white/5 -skew-x-12 transform origin-top"></div>
+                                  <div className="absolute inset-0 bg-white group-hover:bg-slate-50 transition-colors"></div>
                                   <div className="relative z-10 flex justify-between items-center h-full">
                                       <div>
                                           <div className="flex items-center gap-2 mb-2">
-                                              <span className="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30 uppercase tracking-wider">
+                                              <span className="bg-amber-100 text-amber-600 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200 uppercase tracking-wider">
                                                   Legalny Spokój
                                               </span>
                                           </div>
-                                          <h3 className="text-xl font-bold flex items-center gap-2">
-                                              <Scale className="text-amber-300" size={24}/> AI Prawnik
+                                          <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800">
+                                              <Scale className="text-amber-500" size={24}/> AI Prawnik
                                           </h3>
-                                          <p className="text-slate-300 text-sm mt-1 max-w-sm">
+                                          <p className="text-slate-500 text-sm mt-1 max-w-sm">
                                               Analiza umów, generator pism i porady prawne 24/7.
                                           </p>
                                       </div>
-                                      <div className="bg-white/10 p-3 rounded-full group-hover:bg-white/20 transition-colors">
-                                          <ArrowRight size={24} className="text-white"/>
+                                      <div className="bg-slate-100 p-3 rounded-full group-hover:bg-slate-200 transition-colors">
+                                          <ArrowRight size={24} className="text-slate-600"/>
                                       </div>
                                   </div>
                               </div>
@@ -687,7 +615,7 @@ export const DashboardEmployee: React.FC<Props> = ({
                       )}
 
                       {hasSecureMessengerAccess && (
-                          <div className="h-full min-h-[240px]">
+                          <div className="h-full min-h-[240px] bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                               <SecureMessengerWidget
                                   hasAccess={true}
                               />
@@ -695,7 +623,7 @@ export const DashboardEmployee: React.FC<Props> = ({
                       )}
 
                       {hasVaultAccess && (
-                          <div className="h-full min-h-[240px]">
+                          <div className="h-full min-h-[240px] bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                               <SecureDigitalVaultWidget 
                                   hasAccess={true}
                                   onOpen={() => setActiveTab('DIGITAL_VAULT')}
@@ -709,14 +637,13 @@ export const DashboardEmployee: React.FC<Props> = ({
   };
 
   return (
-    <div style={{ background: '#030712', minHeight: '100%', position: 'relative' }} className="pb-24 md:pb-6">
-      {/* CSS Keyframes */}
+    <div className="bg-slate-50 min-h-full relative pb-24 md:pb-6 font-sans text-slate-900">
       <style>{`
         @keyframes ebs-orb {
-          0%,100% { transform: translate(0,0) scale(1); opacity:.35; }
-          25%     { transform: translate(40px,-30px) scale(1.12); opacity:.55; }
-          50%     { transform: translate(-20px,50px) scale(.9); opacity:.25; }
-          75%     { transform: translate(30px,20px) scale(1.06); opacity:.45; }
+          0%,100% { transform: translate(0,0) scale(1); opacity:.5; }
+          25%     { transform: translate(40px,-30px) scale(1.12); opacity:.7; }
+          50%     { transform: translate(-20px,50px) scale(.9); opacity:.4; }
+          75%     { transform: translate(30px,20px) scale(1.06); opacity:.6; }
         }
         @keyframes ebs-grad {
           0%   { background-position: 0% 50%; }
@@ -727,7 +654,7 @@ export const DashboardEmployee: React.FC<Props> = ({
         .ebs-orb-d2 { animation: ebs-orb 17s ease-in-out infinite reverse; }
         .ebs-orb-d3 { animation: ebs-orb 21s ease-in-out infinite 4s; }
         .ebs-grad-text {
-          background: linear-gradient(135deg,#fff 0%,#bfdbfe 40%,#93c5fd 65%,#60a5fa 100%);
+          background: linear-gradient(135deg, #1e293b 0%, #334155 40%, #0f172a 65%, #020617 100%);
           background-size: 200% 200%;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -736,60 +663,46 @@ export const DashboardEmployee: React.FC<Props> = ({
         }
       `}</style>
 
-      {/* Animated Orbs */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
-        {/* Blue orb - top left */}
-        <div className="ebs-orb-d" style={{ position: 'absolute', top: '-10%', left: '-5%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, #2563eb 0%, transparent 70%)', filter: 'blur(80px)', opacity: 0.35 }} />
-        {/* Green orb - bottom right */}
-        <div className="ebs-orb-d2" style={{ position: 'absolute', bottom: '-15%', right: '-10%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, #10b981 0%, transparent 70%)', filter: 'blur(90px)', opacity: 0.3 }} />
-        {/* Cyan orb - middle right */}
-        <div className="ebs-orb-d3" style={{ position: 'absolute', top: '40%', right: '10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, #0891b2 0%, transparent 70%)', filter: 'blur(70px)', opacity: 0.3 }} />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="ebs-orb-d absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,#dbeafe_0%,transparent_70%)] blur-[80px] opacity-25" />
+        <div className="ebs-orb-d2 absolute bottom-[-15%] right-[-10%] w-[700px] h-[700px] rounded-full bg-[radial-gradient(circle,#d1fae5_0%,transparent_70%)] blur-[90px] opacity-25" />
+        <div className="ebs-orb-d3 absolute top-[40%] right-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,#e0e7ff_0%,transparent_70%)] blur-[70px] opacity-20" />
       </div>
 
-      {/* Grid overlay */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px)', backgroundSize: '40px 40px', opacity: 1 }} />
+      <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: 'url(/background.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', opacity: 0.05 }} />
+      
 
-      {/* Content wrapper above orbs */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-      {/* NEW HEADER (Replaces PageHeader) */}
       <div className="hidden md:flex justify-between items-end mb-12">
           <MarketplaceHero />
 
-          {/* Balance Card */}
           <div className="flex flex-col items-end mb-8 animate-in slide-in-from-right duration-700">
-             <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(22px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }} className="p-6 rounded-3xl min-w-[240px] text-right transform hover:scale-105 transition-all duration-300">
-                <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Dostępne środki</p>
-                <div className="flex items-center justify-end gap-2 text-4xl font-black" style={{ color: 'white' }}>
-                   <span className="ebs-grad-text">{user.voucherBalance}</span> <span className="text-lg font-bold self-start mt-2" style={{ color: '#10b981' }}>pkt</span>
+             <div className="bg-white border border-slate-200 p-6 rounded-3xl min-w-[240px] text-right transform hover:scale-105 transition-all duration-300 shadow-sm">
+                <p className="text-xs font-bold uppercase tracking-widest mb-1 text-slate-400">Dostępne środki</p>
+                <div className="flex items-center justify-end gap-2 text-4xl font-black text-slate-800">
+                   <span>{user.voucherBalance}</span> <span className="text-lg font-bold self-start mt-2 text-emerald-500">pkt</span>
                 </div>
-                {/* Visual Indicator */}
-                <div className="w-full h-1.5 rounded-full mt-4 overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                   <div className="h-full w-3/4 rounded-full" style={{ background: 'linear-gradient(90deg, #2563eb, #10b981)' }}></div>
+                <div className="w-full h-1.5 rounded-full mt-4 overflow-hidden bg-slate-100">
+                   <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-blue-500 to-emerald-500"></div>
                 </div>
              </div>
           </div>
       </div>
-
-      {/* VIEW CONTENT */}
-      {/* ONE PAGER MODIFICATION: Render Wallet AND Catalog sequentially if activeTab is WALLET or CATALOG */}
       
       {(activeTab === 'WALLET' || activeTab === 'CATALOG') && (
         <div className="space-y-12">
-            {/* 1. PULPIT (WALLET) */}
             <div id="section-wallet">
                 {renderWallet()}
             </div>
 
-            {/* SEPARATOR / HEADER for Catalog */}
             <div className="flex items-center gap-4 py-4" id="catalog-anchor">
-                <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.08)' }}></div>
-                <h3 className="text-xl font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.25)' }}>Zamknięty Katalog Usług</h3>
-                <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.08)' }}></div>
+                <div className="h-px flex-1 bg-slate-200"></div>
+                <h3 className="text-xl font-bold uppercase tracking-widest text-slate-600">Katalog Usług</h3>
+                <div className="h-px flex-1 bg-slate-200"></div>
             </div>
 
-            {/* 2. CATALOG */}
-            <div className="min-h-[600px]">
+            <div className="min-h-[600px] bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                 <ServiceCatalog 
                     services={displayServices}
                     userBalance={user.voucherBalance}
@@ -797,18 +710,21 @@ export const DashboardEmployee: React.FC<Props> = ({
                 />
             </div>
             
-            {/* END MARDER */}
-            <div className="text-center py-12 pb-24" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <div className="text-center py-12 pb-24 text-slate-400">
                 <p className="text-sm font-medium">To już koniec ofert na dziś.</p>
-                <div className="w-2 h-2 rounded-full mx-auto mt-4" style={{ background: 'rgba(255,255,255,0.1)' }}></div>
+                <div className="w-2 h-2 rounded-full mx-auto mt-4 bg-slate-200"></div>
             </div>
         </div>
       )}
 
       {activeTab === 'HISTORY' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in slide-in-from-bottom-4 duration-300">
-            <EmployeeTransactionHistory transactions={transactions} />
-            <EmployeeBuybackList buybacks={buybacks} onViewAgreement={onViewAgreement} />
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-2 overflow-hidden">
+                <EmployeeTransactionHistory transactions={transactions} />
+            </div>
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-2 overflow-hidden">
+                <EmployeeBuybackList buybacks={buybacks} onViewAgreement={onViewAgreement} />
+            </div>
         </div>
       )}
 
@@ -819,17 +735,18 @@ export const DashboardEmployee: React.FC<Props> = ({
               
               <EmployeeGuide onClose={() => setShowGuide(false)} forceVisible={true} />
 
-              <SupportTicketSystem 
-                  currentUser={user}
-                  tickets={tickets}
-                  onCreateTicket={actions.handleCreateTicket}
-                  onReply={actions.handleReplyTicket}
-                  onUpdateStatus={actions.handleUpdateTicketStatus}
-              />
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-2">
+                  <SupportTicketSystem 
+                      currentUser={user}
+                      tickets={tickets}
+                      onCreateTicket={actions.handleCreateTicket}
+                      onReply={actions.handleReplyTicket}
+                      onUpdateStatus={actions.handleUpdateTicketStatus}
+                  />
+              </div>
           </div>
       )}
 
-      {/* MODALS */}
       {selectedService && (
           <RedemptionModal 
               isOpen={!!selectedService}
@@ -837,7 +754,6 @@ export const DashboardEmployee: React.FC<Props> = ({
               service={selectedService}
               onConfirm={() => {
                   onPurchaseService(selectedService);
-                  // Auto-switch to newly purchased app
                   if (selectedService.id === 'SRV-MENTAL-01') {
                       setTimeout(() => setActiveTab('WELLBEING'), 1000);
                   } else if (selectedService.id === 'SRV-LEGAL-01') {
@@ -847,7 +763,6 @@ export const DashboardEmployee: React.FC<Props> = ({
           />
       )}
 
-      {/* MOBILE NAV (Always at bottom) */}
       <MobileNav
           activeTab={activeTab}
           onChangeTab={(tabId) => {
@@ -864,7 +779,7 @@ export const DashboardEmployee: React.FC<Props> = ({
           hasMentalHealth={hasMentalHealthAccess}
           hasLegal={hasLegalAccess}
       />
-      </div>{/* end content wrapper */}
+      </div>
     </div>
   );
 };

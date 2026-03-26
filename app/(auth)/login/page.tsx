@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -54,7 +54,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex items-center justify-center bg-gray-950">
       <div className="w-full max-w-sm bg-gray-900 rounded-2xl p-8 shadow-xl">
         <h1 className="text-2xl font-bold text-white mb-6 text-center">
-          Eliton Benefits
+          BBS
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,3 +96,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

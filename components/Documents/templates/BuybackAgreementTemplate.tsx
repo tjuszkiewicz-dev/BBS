@@ -1,4 +1,4 @@
-
+﻿
 import React from 'react';
 import { BuybackAgreement, User } from '../../../types';
 import { PDF_LAYOUT } from '../PDF_LAYOUT';
@@ -151,9 +151,10 @@ export const BuybackAgreementTemplate: React.FC<Props> = ({ data, user }) => {
          </div>
          
          <div className="text-center mt-8 text-gray-400 font-sans border-t border-gray-200 pt-2" style={{ fontSize: '7pt' }}>
-            Dokument wygenerowany z systemu Eliton Benefits System (EBS) | ID: {data.id} | Suma kontrolna: {data.id.split('-').pop()}
+            Dokument wygenerowany z systemu BBS (EBS) | ID: {data.id} | Suma kontrolna: {data.id.split('-').pop()}
          </div>
        </div>
     </div>
   );
 };
+

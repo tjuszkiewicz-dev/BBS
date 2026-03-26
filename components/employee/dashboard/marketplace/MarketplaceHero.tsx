@@ -10,13 +10,13 @@ export const MarketplaceHero = () => {
                 </span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-[1.15] mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 leading-[1.15] mb-4">
                 Katalog, który <br/>
-                <span className="text-emerald-500">pracownicy faktycznie</span><br/>
-                <span className="text-emerald-500">lubią.</span>
+                <span className="text-emerald-600">pracownicy faktycznie</span><br/>
+                <span className="text-emerald-600">lubią.</span>
             </h1>
             
-            <p className="text-slate-500 text-sm max-w-lg leading-relaxed">
+            <p className="text-slate-600 text-sm max-w-lg leading-relaxed">
                 Zamiast 1000 zniżek na pizzę, dajemy narzędzia, które realnie poprawiają jakość życia i bezpieczeństwo Twojego zespołu.
             </p>
         </div>
