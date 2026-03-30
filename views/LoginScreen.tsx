@@ -251,10 +251,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
         // wall bounce — use CARD_R as uniform margin so rotated cards
         // always bounce at the same visual distance from every edge
         const R = CARD_R;
-        if (b.x < R)       { b.x = R;       b.vx =  Math.abs(b.vx) * 0.221; b.rotV *= 0.35; }
-        if (b.x > W - R)   { b.x = W - R;   b.vx = -Math.abs(b.vx) * 0.221; b.rotV *= 0.35; }
-        if (b.y < R)       { b.y = R;        b.vy =  Math.abs(b.vy) * 0.221; b.rotV *= 0.35; }
-        if (b.y > H - R)   { b.y = H - R;   b.vy = -Math.abs(b.vy) * 0.221; b.rotV *= 0.35; }
+        if (b.x < R)       { b.x = R;       b.vx =  Math.abs(b.vx) * 0.287; b.rotV *= 0.35; }
+        if (b.x > W - R)   { b.x = W - R;   b.vx = -Math.abs(b.vx) * 0.287; b.rotV *= 0.35; }
+        if (b.y < R)       { b.y = R;        b.vy =  Math.abs(b.vy) * 0.287; b.rotV *= 0.35; }
+        if (b.y > H - R)   { b.y = H - R;   b.vy = -Math.abs(b.vy) * 0.287; b.rotV *= 0.35; }
       }
 
       for (let i = 0; i < balls.length; i++) {
@@ -270,13 +270,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
             const dvx = a.vx - b.vx, dvy = a.vy - b.vy;
             const dot = dvx * nx + dvy * ny;
             if (dot > 0) {
-              // restitution 0.55 — elastic-like, strong bounce response
-              const restitution = 0.55;
+              // restitution 0.715 — +30% bounce
+              const restitution = 0.715;
               a.vx -= dot * nx * restitution; a.vy -= dot * ny * restitution;
               b.vx += dot * nx * restitution; b.vy += dot * ny * restitution;
               // minimal post-collision damping — preserve energy
-              a.vx *= 0.88; a.vy *= 0.88;
-              b.vx *= 0.88; b.vy *= 0.88;
+              a.vx *= 0.93; a.vy *= 0.93;
+              b.vx *= 0.93; b.vy *= 0.93;
               a.rotV *= 0.70;
               b.rotV *= 0.70;
             }
@@ -297,12 +297,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
           const ov = (minDist - dist) * 0.5;
           b.x += nx * ov;
           b.y += ny * ov;
-          const mvx = Math.max(-6, Math.min(6, mouse.vx));
-          const mvy = Math.max(-6, Math.min(6, mouse.vy));
+          const mvx = Math.max(-7.8, Math.min(7.8, mouse.vx));
+          const mvy = Math.max(-7.8, Math.min(7.8, mouse.vy));
           const speed = Math.sqrt(mvx * mvx + mvy * mvy);
           const relVn = (b.vx - mvx) * nx + (b.vy - mvy) * ny;
           if (relVn < 0) {
-            const impulse = -0.30 * relVn;
+            const impulse = -0.507 * relVn;
             b.vx += impulse * nx;
             b.vy += impulse * ny;
 
@@ -312,7 +312,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
             const mvt_y = mvy - (mvx * nx + mvy * ny) * ny;
             const torque = (cx * mvt_y - cy * mvt_x) / (CARD_R * CARD_R);
             const edgeFactor = Math.min(1, (minDist - dist) < CARD_R * 0.5 ? 1.0 : 0.4);
-            b.rotV += torque * speed * 0.147 * edgeFactor;
+            b.rotV += torque * speed * 0.191 * edgeFactor;
             b.rotV = Math.max(-2.5, Math.min(2.5, b.rotV));
           }
         }
@@ -812,7 +812,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
                               onChange={e=>setEmail(e.target.value)}
                               onFocus={()=>setShowDropdown(true)}
                               onBlur={()=>setTimeout(()=>setShowDropdown(false),150)}
-                              placeholder="m_koch"
+                              placeholder="login lub e-mail"
                               className="ebs-input"
                               style={{ paddingRight:44 }}
                             />
