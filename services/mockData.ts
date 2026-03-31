@@ -1,34 +1,34 @@
-Ôªø
+
 import { Company, Role, User, Voucher, VoucherStatus, Order, OrderStatus, AuditLogEntry, Commission, Notification, NotificationConfig, NotificationTarget, NotificationTrigger, ServiceItem, ServiceType, Transaction, SystemConfig, DocumentType, ContractType, SupportTicket } from '../types';
 
-// Struktura Sprzeda≈ºy
+// Struktura Sprzedaøy
 const ADVISOR_ID = 'ADV-001';
 const MANAGER_ID = 'MAN-001';
 const DIRECTOR_ID = 'DIR-001';
 
-const BUYBACK_TEMPLATE_CONTENT = `UMOWA ODKUPU VOUCHER√ìW NR: {AGREEMENT_ID}
+const BUYBACK_TEMPLATE_CONTENT = `UMOWA ODKUPU VOUCHER”W NR: {AGREEMENT_ID}
 
-Zawarta w dniu {DATE} pomiƒôdzy:
+Zawarta w dniu {DATE} pomiÍdzy:
 
-1. STRATTON PRIME S.A. z siedzibƒÖ w Warszawie (W≈Ça≈õciciel platformy BBS), zwanym dalej "Operatorem",
+1. STRATTON PRIME S.A. z siedzibπ w Warszawie (W≥aúciciel platformy BBS), zwanym dalej "Operatorem",
 a
-2. {USER_NAME} (ID Systemowe: {USER_ID}), zwanym dalej "U≈ºytkownikiem".
+2. {USER_NAME} (ID Systemowe: {USER_ID}), zwanym dalej "Uøytkownikiem".
 
-¬ß1 PRZEDMIOT UMOWY
-1. U≈ºytkownik o≈õwiadcza, ≈ºe posiada {VOUCHER_COUNT} sztuk Voucher√≥w Prime, kt√≥re uleg≈Çy przeterminowaniu lub rezygnacji, o ≈ÇƒÖcznej warto≈õci nominalnej {TOTAL_VALUE} PLN.
-2. Operator zobowiƒÖzuje siƒô do odkupu wy≈ºej wymienionych Voucher√≥w za kwotƒô {TOTAL_VALUE} PLN (s≈Çownie: {TOTAL_VALUE} z≈Çotych 00/100).
+ß1 PRZEDMIOT UMOWY
+1. Uøytkownik oúwiadcza, øe posiada {VOUCHER_COUNT} sztuk VoucherÛw Prime, ktÛre uleg≥y przeterminowaniu lub rezygnacji, o ≥πcznej wartoúci nominalnej {TOTAL_VALUE} PLN.
+2. Operator zobowiπzuje siÍ do odkupu wyøej wymienionych VoucherÛw za kwotÍ {TOTAL_VALUE} PLN (s≥ownie: {TOTAL_VALUE} z≥otych 00/100).
 
-¬ß2 WARUNKI P≈ÅATNO≈öCI
-1. P≈Çatno≈õƒá nastƒÖpi w formie uznania salda technicznego lub przelewu na rachunek bankowy powiƒÖzany z kontem U≈ºytkownika w Systemie EBS w terminie 7 dni.
-2. Z chwilƒÖ zatwierdzenia niniejszej umowy Vouchery zostajƒÖ trwale wycofane z obiegu (anulowane) i nie mogƒÖ byƒá wykorzystane do zakupu us≈Çug.
+ß2 WARUNKI P£ATNOåCI
+1. P≥atnoúÊ nastπpi w formie uznania salda technicznego lub przelewu na rachunek bankowy powiπzany z kontem Uøytkownika w Systemie EBS w terminie 7 dni.
+2. Z chwilπ zatwierdzenia niniejszej umowy Vouchery zostajπ trwale wycofane z obiegu (anulowane) i nie mogπ byÊ wykorzystane do zakupu us≥ug.
 
-¬ß3 POSTANOWIENIA KO≈ÉCOWE
-1. Umowa zosta≈Ça wygenerowana elektronicznie w systemie BBS (EBS) i nie wymaga odrƒôcznego podpisu.
-2. Data wygenerowania dokumentu jest datƒÖ skutecznego zawarcia umowy pod warunkiem jej zatwierdzenia przez Operatora.
+ß3 POSTANOWIENIA KO—COWE
+1. Umowa zosta≥a wygenerowana elektronicznie w systemie BBS (EBS) i nie wymaga odrÍcznego podpisu.
+2. Data wygenerowania dokumentu jest datπ skutecznego zawarcia umowy pod warunkiem jej zatwierdzenia przez Operatora.
 
 PODPISANO:
 Operator: System BBS (w im. Stratton Prime)
-U≈ºytkownik: {USER_NAME} (Akceptacja Elektroniczna)`;
+Uøytkownik: {USER_NAME} (Akceptacja Elektroniczna)`;
 
 export const INITIAL_SYSTEM_CONFIG: SystemConfig = {
   // Global
@@ -55,29 +55,29 @@ export const INITIAL_SYSTEM_CONFIG: SystemConfig = {
         version: 1,
         lastModified: new Date().toISOString(),
         accessRoles: [Role.SUPERADMIN, Role.EMPLOYEE],
-        description: 'Domy≈õlny wz√≥r umowy generowanej przy wygasaniu voucher√≥w.',
+        description: 'Domyúlny wzÛr umowy generowanej przy wygasaniu voucherÛw.',
         isSystem: true
     },
     {
         id: 'TPL-002',
         name: 'Regulamin Platformy 2025',
         type: DocumentType.POLICY,
-        content: `REGULAMIN SYSTEMU BENEFITOWEGO BBS (EBS)\n\n¬ß1 Postanowienia Og√≥lne\n1. Operatorem systemu jest Stratton Prime S.A.\n2. U≈ºytkownik zobowiƒÖzany jest do...`,
+        content: `REGULAMIN SYSTEMU BENEFITOWEGO BBS (EBS)\n\nß1 Postanowienia OgÛlne\n1. Operatorem systemu jest Stratton Prime S.A.\n2. Uøytkownik zobowiπzany jest do...`,
         version: 2,
         lastModified: new Date().toISOString(),
         accessRoles: [Role.SUPERADMIN, Role.HR, Role.EMPLOYEE],
-        description: 'Og√≥lne warunki korzystania z platformy.',
+        description: 'OgÛlne warunki korzystania z platformy.',
         isSystem: true
     },
     {
         id: 'TPL-003',
-        name: 'Nota ObciƒÖ≈ºeniowa (Vouchery)',
+        name: 'Nota Obciπøeniowa (Vouchery)',
         type: DocumentType.INVOICE,
-        content: `NOTA KSIƒòGOWA NR: {DOC_ID}\n\nNabywca: {COMPANY_NAME}\nNIP: {COMPANY_NIP}\n\nTre≈õƒá: Zasilenie konta punktowego.\nWarto≈õƒá: {TOTAL_VALUE} PLN.\nTermin: {PAYMENT_TERMS} dni.`,
+        content: `NOTA KSI GOWA NR: {DOC_ID}\n\nNabywca: {COMPANY_NAME}\nNIP: {COMPANY_NIP}\n\nTreúÊ: Zasilenie konta punktowego.\nWartoúÊ: {TOTAL_VALUE} PLN.\nTermin: {PAYMENT_TERMS} dni.`,
         version: 1,
         lastModified: new Date().toISOString(),
         accessRoles: [Role.SUPERADMIN, Role.HR],
-        description: 'Wz√≥r noty ksiƒôgowej dla HR.',
+        description: 'WzÛr noty ksiÍgowej dla HR.',
         isSystem: true
     }
   ]
@@ -136,7 +136,7 @@ export const INITIAL_USERS: User[] = [
     role: Role.HR,
     companyId: 'FIRMA-042',
     name: 'Anna Nowak (HR)',
-    email: 'hr@techsolutions.pl',
+    email: 'hr@alces.pl',
     voucherBalance: 0,
     pesel: '85010112345',
     department: 'HR',
@@ -144,7 +144,7 @@ export const INITIAL_USERS: User[] = [
     status: 'ACTIVE',
     username: 'hr',
     password: '123',
-    identity: { firstName: 'Anna', lastName: 'Nowak', pesel: '85010112345', email: 'hr@techsolutions.pl' },
+    identity: { firstName: 'Anna', lastName: 'Nowak', pesel: '85010112345', email: 'hr@alces.pl' },
     organization: { department: 'HR', position: 'Manager' }
   },
   // --- EMPLOYEES (New EPS Structure) ---
@@ -159,7 +159,7 @@ export const INITIAL_USERS: User[] = [
     
     // Facade
     name: 'Jan Kowalski',
-    email: 'jan.kowalski@techsolutions.pl',
+    email: 'jan.kowalski@alces.pl',
     pesel: '90051209876',
     department: 'IT',
     position: 'Senior Developer',
@@ -169,7 +169,7 @@ export const INITIAL_USERS: User[] = [
         firstName: 'Jan', 
         lastName: 'Kowalski', 
         pesel: '90051209876', 
-        email: 'jan.kowalski@techsolutions.pl' 
+        email: 'jan.kowalski@alces.pl' 
     },
     organization: { 
         department: 'IT', 
@@ -197,8 +197,8 @@ export const INITIAL_USERS: User[] = [
     voucherBalance: 50,
 
     // Facade
-    name: 'Piotr Wi≈õniewski',
-    email: 'piotr.w@techsolutions.pl',
+    name: 'Piotr Wiúniewski',
+    email: 'piotr.w@alces.pl',
     pesel: '95113005432',
     department: 'Marketing',
     position: 'Junior Specialist',
@@ -206,9 +206,9 @@ export const INITIAL_USERS: User[] = [
     // EPS Layers
     identity: { 
         firstName: 'Piotr', 
-        lastName: 'Wi≈õniewski', 
+        lastName: 'Wiúniewski', 
         pesel: '95113005432', 
-        email: 'piotr.w@techsolutions.pl' 
+        email: 'piotr.w@alces.pl' 
     },
     organization: { 
         department: 'Marketing', 
@@ -233,7 +233,7 @@ export const INITIAL_USERS: User[] = [
 
     // Facade
     name: 'Maciej Koch',
-    email: 'm.koch@techsolutions.pl',
+    email: 'm.koch@alces.pl',
     pesel: '88030512345',
     department: 'Produkcja',
     position: 'Pracownik',
@@ -242,7 +242,7 @@ export const INITIAL_USERS: User[] = [
         firstName: 'Maciej',
         lastName: 'Koch',
         pesel: '88030512345',
-        email: 'm.koch@techsolutions.pl'
+        email: 'm.koch@alces.pl'
     },
     organization: {
         department: 'Produkcja',
@@ -275,7 +275,7 @@ export const INITIAL_USERS: User[] = [
 
     // Facade
     name: 'Igor Matczak',
-    email: 'i.matczak@techsolutions.pl',
+    email: 'i.matczak@alces.pl',
     pesel: '82051312345',
     department: 'Produkcja',
     position: 'Pracownik',
@@ -284,7 +284,7 @@ export const INITIAL_USERS: User[] = [
         firstName: 'Igor',
         lastName: 'Matczak',
         pesel: '82051312345',
-        email: 'i.matczak@techsolutions.pl'
+        email: 'i.matczak@alces.pl'
     },
     organization: {
         department: 'Produkcja',
@@ -317,7 +317,7 @@ export const INITIAL_USERS: User[] = [
 
     // Facade
     name: 'Anna Stawnicza',
-    email: 'a.stawnicza@techsolutions.pl',
+    email: 'a.stawnicza@alces.pl',
     pesel: '91040298765',
     department: 'Produkcja',
     position: 'Pracownik',
@@ -326,7 +326,7 @@ export const INITIAL_USERS: User[] = [
         firstName: 'Anna',
         lastName: 'Stawnicza',
         pesel: '91040298765',
-        email: 'a.stawnicza@techsolutions.pl'
+        email: 'a.stawnicza@alces.pl'
     },
     organization: {
         department: 'Produkcja',
@@ -358,17 +358,17 @@ export const INITIAL_USERS: User[] = [
     password: '123malstebelska123',
 
     // Facade
-    name: 'Ma≈Çgorzata Stebelska',
-    email: 'm.stebelska@techsolutions.pl',
+    name: 'Ma≥gorzata Stebelska',
+    email: 'm.stebelska@alces.pl',
     pesel: '78120556789',
     department: 'Produkcja',
     position: 'Pracownik',
 
     identity: {
-        firstName: 'Ma≈Çgorzata',
+        firstName: 'Ma≥gorzata',
         lastName: 'Stebelska',
         pesel: '78120556789',
-        email: 'm.stebelska@techsolutions.pl'
+        email: 'm.stebelska@alces.pl'
     },
     organization: {
         department: 'Produkcja',
@@ -401,7 +401,7 @@ export const INITIAL_USERS: User[] = [
 
     // Facade
     name: 'Marek Szpila',
-    email: 'm.szpila@techsolutions.pl',
+    email: 'm.szpila@alces.pl',
     pesel: '85073054321',
     department: 'Produkcja',
     position: 'Pracownik',
@@ -410,7 +410,7 @@ export const INITIAL_USERS: User[] = [
         firstName: 'Marek',
         lastName: 'Szpila',
         pesel: '85073054321',
-        email: 'm.szpila@techsolutions.pl'
+        email: 'm.szpila@alces.pl'
     },
     organization: {
         department: 'Produkcja',
@@ -443,7 +443,7 @@ export const INITIAL_USERS: User[] = [
 
     // Facade
     name: 'Agnieszka Krzanik',
-    email: 'a.krzanik@techsolutions.pl',
+    email: 'a.krzanik@alces.pl',
     pesel: '94092812345',
     department: 'Produkcja',
     position: 'Pracownik',
@@ -452,7 +452,7 @@ export const INITIAL_USERS: User[] = [
         firstName: 'Agnieszka',
         lastName: 'Krzanik',
         pesel: '94092812345',
-        email: 'a.krzanik@techsolutions.pl'
+        email: 'a.krzanik@alces.pl'
     },
     organization: {
         department: 'Produkcja',
@@ -484,17 +484,17 @@ export const INITIAL_USERS: User[] = [
     password: '123grzchorazy123',
 
     // Facade
-    name: 'Grzegorz ChorƒÖ≈ºy',
-    email: 'g.chorazy@techsolutions.pl',
+    name: 'Grzegorz Chorπøy',
+    email: 'g.chorazy@alces.pl',
     pesel: '75081567890',
     department: 'Produkcja',
     position: 'Pracownik',
 
     identity: {
         firstName: 'Grzegorz',
-        lastName: 'ChorƒÖ≈ºy',
+        lastName: 'Chorπøy',
         pesel: '75081567890',
-        email: 'g.chorazy@techsolutions.pl'
+        email: 'g.chorazy@alces.pl'
     },
     organization: {
         department: 'Produkcja',
@@ -513,13 +513,97 @@ export const INITIAL_USERS: User[] = [
             lastVerifiedAt: new Date().toISOString()
         }
     }
+  },
+  {
+    id: 'EMP-010',
+    role: Role.EMPLOYEE,
+    companyId: 'FIRMA-042',
+    status: 'ACTIVE',
+    voucherBalance: 0,
+
+    // Credentials
+    username: 'p_zawadzki',
+    password: '123pawzawadzki123',
+
+    // Facade
+    name: 'Pawe≥ Zawadzki',
+    email: 'p.zawadzki@alces.pl',
+    pesel: '86070712345',
+    department: 'Produkcja',
+    position: 'Pracownik',
+
+    identity: {
+        firstName: 'Pawe≥',
+        lastName: 'Zawadzki',
+        pesel: '86070712345',
+        email: 'p.zawadzki@alces.pl'
+    },
+    organization: {
+        department: 'Produkcja',
+        position: 'Pracownik'
+    },
+    contract: {
+        type: ContractType.UOP,
+        hasSicknessInsurance: true
+    },
+    finance: {
+        payoutAccount: {
+            iban: 'PL77777777777777777777777777',
+            country: 'PL',
+            isVerified: true,
+            verificationMethod: 'MICROTRANSFER',
+            lastVerifiedAt: new Date().toISOString()
+        }
+    }
+  },
+  {
+    id: 'EMP-011',
+    role: Role.EMPLOYEE,
+    companyId: 'FIRMA-042',
+    status: 'ACTIVE',
+    voucherBalance: 0,
+
+    // Credentials
+    username: 'i_lawryk',
+    password: '123izalawryk123',
+
+    // Facade
+    name: 'Izabela Lawryk',
+    email: 'i.lawryk@alces.pl',
+    pesel: '93022198765',
+    department: 'Produkcja',
+    position: 'Pracownik',
+
+    identity: {
+        firstName: 'Izabela',
+        lastName: 'Lawryk',
+        pesel: '93022198765',
+        email: 'i.lawryk@alces.pl'
+    },
+    organization: {
+        department: 'Produkcja',
+        position: 'Pracownik'
+    },
+    contract: {
+        type: ContractType.UOP,
+        hasSicknessInsurance: true
+    },
+    finance: {
+        payoutAccount: {
+            iban: 'PL88888888888888888888888888',
+            country: 'PL',
+            isVerified: true,
+            verificationMethod: 'MICROTRANSFER',
+            lastVerifiedAt: new Date().toISOString()
+        }
+    }
   }
 ];
 
 export const INITIAL_COMPANIES: Company[] = [
   {
     id: 'FIRMA-042',
-    name: 'TechSolutions Sp. z o.o.',
+    name: 'Alces Sp. z o.o.',
     nip: '525-000-11-22',
     balancePending: 0,
     balanceActive: 500,
@@ -588,7 +672,7 @@ export const INITIAL_NOTIFICATION_CONFIGS: NotificationConfig[] = [
     target: NotificationTarget.EMPLOYEE, 
     trigger: NotificationTrigger.VOUCHER_GRANTED,
     daysOffset: 0, 
-    messageTemplate: 'Otrzyma≈Çe≈õ {AMOUNT} voucher√≥w. Wa≈ºne do: {EXPIRY_DATE}.', 
+    messageTemplate: 'Otrzyma≥eú {AMOUNT} voucherÛw. Waøne do: {EXPIRY_DATE}.', 
     isEnabled: true 
   },
   { 
@@ -596,7 +680,7 @@ export const INITIAL_NOTIFICATION_CONFIGS: NotificationConfig[] = [
     target: NotificationTarget.EMPLOYEE, 
     trigger: NotificationTrigger.VOUCHER_EXPIRING,
     daysOffset: 3, 
-    messageTemplate: 'Twoje vouchery ({AMOUNT} szt.) wygasajƒÖ za 3 dni.', 
+    messageTemplate: 'Twoje vouchery ({AMOUNT} szt.) wygasajπ za 3 dni.', 
     isEnabled: true 
   },
   { 
@@ -604,7 +688,7 @@ export const INITIAL_NOTIFICATION_CONFIGS: NotificationConfig[] = [
     target: NotificationTarget.HR, 
     trigger: NotificationTrigger.ORDER_UNPAID,
     daysOffset: 7, 
-    messageTemplate: 'Przypomnienie o p≈Çatno≈õci za fakturƒô {DOC_ID}.', 
+    messageTemplate: 'Przypomnienie o p≥atnoúci za fakturÍ {DOC_ID}.', 
     isEnabled: true 
   }
 ];
@@ -614,7 +698,7 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   { 
       id: 'SRV-MENTAL-01', 
       name: 'EBS Wellbeing Premium', 
-      description: 'Miesiƒôczny dostƒôp do platformy Mental Health (AI Coach, Medytacje, Wideo).', 
+      description: 'MiesiÍczny dostÍp do platformy Mental Health (AI Coach, Medytacje, Wideo).', 
       price: 100, // 100 points cost
       type: ServiceType.SUBSCRIPTION, 
       icon: 'Brain', 
@@ -625,7 +709,7 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   { 
       id: 'SRV-LEGAL-01', 
       name: 'AI Legal Assistant', 
-      description: 'Tw√≥j osobisty prawnik 24/7. Analiza um√≥w i porady prawne.', 
+      description: 'TwÛj osobisty prawnik 24/7. Analiza umÛw i porady prawne.', 
       price: 150, 
       type: ServiceType.SUBSCRIPTION, 
       icon: 'Scale', 
@@ -635,7 +719,7 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   { 
       id: 'SRV-LEGAL-SINGLE', 
       name: 'Analiza Umowy (Jednorazowa)', 
-      description: 'Sprawdzenie jednego dokumentu PDF pod kƒÖtem klauzul abuzywnych.', 
+      description: 'Sprawdzenie jednego dokumentu PDF pod kπtem klauzul abuzywnych.', 
       price: 50, 
       type: ServiceType.ONE_TIME, 
       icon: 'FileText', 
@@ -645,8 +729,8 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   // --- OFERTA ORANGE ---
   { 
       id: 'SRV-ORANGE-FIBER', 
-      name: '≈öwiat≈Çow√≥d Pro 2.0', 
-      description: 'Super szybki internet ≈õwiat≈Çowodowy do Twojego domu.', 
+      name: 'åwiat≥owÛd Pro 2.0', 
+      description: 'Super szybki internet úwiat≥owodowy do Twojego domu.', 
       price: 59, 
       type: ServiceType.SUBSCRIPTION, 
       icon: 'Wifi', 
@@ -656,7 +740,7 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   { 
       id: 'SRV-ORANGE-GSM', 
       name: 'Plan Firmowy L', 
-      description: 'Nielimitowane rozmowy i SMSy, du≈ºy pakiet danych.', 
+      description: 'Nielimitowane rozmowy i SMSy, duøy pakiet danych.', 
       price: 45, 
       type: ServiceType.SUBSCRIPTION, 
       icon: 'Smartphone', 
@@ -666,7 +750,7 @@ export const INITIAL_SERVICES: ServiceItem[] = [
   { 
       id: 'SRV-ORANGE-LOVE', 
       name: 'Orange Love Mini', 
-      description: 'Pakiet us≈Çug dla ca≈Çej rodziny w jednej cenie.', 
+      description: 'Pakiet us≥ug dla ca≥ej rodziny w jednej cenie.', 
       price: 89, 
       type: ServiceType.SUBSCRIPTION, 
       icon: 'Heart', 
@@ -674,44 +758,44 @@ export const INITIAL_SERVICES: ServiceItem[] = [
       isActive: true 
   },
   // -------------------------------------
-  { id: 'SRV-01', name: 'Spotify Premium (30 dni)', description: 'Dostƒôp do muzyki bez reklam', price: 20, type: ServiceType.SUBSCRIPTION, icon: 'Headphones', image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-01', name: 'Spotify Premium (30 dni)', description: 'DostÍp do muzyki bez reklam', price: 20, type: ServiceType.SUBSCRIPTION, icon: 'Headphones', image: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-02', name: 'Audioteka (1 Audiobook)', description: 'Dowolny audiobook z oferty', price: 35, type: ServiceType.ONE_TIME, icon: 'BookOpen', image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-03', name: 'Porada Prawna Online (Cz≈Çowiek)', description: 'Konsultacja z radcƒÖ prawnym (Video)', price: 200, type: ServiceType.ONE_TIME, icon: 'Scale', image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-03', name: 'Porada Prawna Online (Cz≥owiek)', description: 'Konsultacja z radcπ prawnym (Video)', price: 200, type: ServiceType.ONE_TIME, icon: 'Scale', image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-04', name: 'Multikino (Bilet)', description: 'Bilet na dowolny seans 2D', price: 25, type: ServiceType.ONE_TIME, icon: 'Film', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800', isActive: true },
 
   // --- AI & PRODUCTIVITY ---
-  { id: 'SRV-AI-01', name: 'Tw√≥j pierwszy dzie≈Ñ z osobistym AI', description: 'Jak delegowaƒá nudne zadania.', price: 23, type: ServiceType.ONE_TIME, icon: 'Cpu', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-AI-02', name: 'Prompt Engineering dla nietechnicznych', description: 'Jak rozmawiaƒá z maszynƒÖ, by Ciƒô rozumia≈Ça.', price: 41, type: ServiceType.ONE_TIME, icon: 'Zap', image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-AI-03', name: 'G≈Çƒôboka praca w ≈õwiecie powiadomie≈Ñ', description: 'Techniki koncentracji w 2026 roku.', price: 12, type: ServiceType.ONE_TIME, icon: 'Brain', image: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-AI-04', name: 'Automatyzacja codzienno≈õci', description: 'Proste triki na cyfrowe porzƒÖdki.', price: 37, type: ServiceType.ONE_TIME, icon: 'Settings', image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-AI-05', name: 'Etyka AI w Twoim biurze', description: 'Co wolno, a czego nie, u≈ºywajƒÖc sztucznej inteligencji.', price: 49, type: ServiceType.ONE_TIME, icon: 'Shield', image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-AI-01', name: 'TwÛj pierwszy dzieÒ z osobistym AI', description: 'Jak delegowaÊ nudne zadania.', price: 23, type: ServiceType.ONE_TIME, icon: 'Cpu', image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-AI-02', name: 'Prompt Engineering dla nietechnicznych', description: 'Jak rozmawiaÊ z maszynπ, by CiÍ rozumia≥a.', price: 41, type: ServiceType.ONE_TIME, icon: 'Zap', image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-AI-03', name: 'G≥Íboka praca w úwiecie powiadomieÒ', description: 'Techniki koncentracji w 2026 roku.', price: 12, type: ServiceType.ONE_TIME, icon: 'Brain', image: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-AI-04', name: 'Automatyzacja codziennoúci', description: 'Proste triki na cyfrowe porzπdki.', price: 37, type: ServiceType.ONE_TIME, icon: 'Settings', image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-AI-05', name: 'Etyka AI w Twoim biurze', description: 'Co wolno, a czego nie, uøywajπc sztucznej inteligencji.', price: 49, type: ServiceType.ONE_TIME, icon: 'Shield', image: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&q=80&w=800', isActive: true },
 
   // --- MENTAL HEALTH ---
-  { id: 'SRV-MH-01', name: 'Cyfrowy detoks w 15 minut', description: 'Jak odzyskaƒá spok√≥j bez wyrzucania telefonu.', price: 9, type: ServiceType.ONE_TIME, icon: 'Smartphone', image: 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-MH-02', name: 'Trening odporno≈õci na stres (Resilience)', description: 'Techniki jednostek specjalnych dla korporacji.', price: 33, type: ServiceType.ONE_TIME, icon: 'Heart', image: 'https://images.unsplash.com/photo-1522204538344-922f76ecc041?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-MH-03', name: 'Sztuka asertywno≈õci na Teamsach', description: 'Jak m√≥wiƒá "nie" bez poczucia winy.', price: 21, type: ServiceType.ONE_TIME, icon: 'MessageSquare', image: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-MH-04', name: 'Sen jako Tw√≥j najlepszy projekt', description: 'Biohacking nocnej regeneracji.', price: 44, type: ServiceType.ONE_TIME, icon: 'Moon', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-MH-05', name: 'Praca z domu i samotno≈õƒá', description: 'Jak budowaƒá relacje w trybie remote.', price: 15, type: ServiceType.ONE_TIME, icon: 'Users', image: 'https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-MH-01', name: 'Cyfrowy detoks w 15 minut', description: 'Jak odzyskaÊ spokÛj bez wyrzucania telefonu.', price: 9, type: ServiceType.ONE_TIME, icon: 'Smartphone', image: 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-MH-02', name: 'Trening odpornoúci na stres (Resilience)', description: 'Techniki jednostek specjalnych dla korporacji.', price: 33, type: ServiceType.ONE_TIME, icon: 'Heart', image: 'https://images.unsplash.com/photo-1522204538344-922f76ecc041?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-MH-03', name: 'Sztuka asertywnoúci na Teamsach', description: 'Jak mÛwiÊ "nie" bez poczucia winy.', price: 21, type: ServiceType.ONE_TIME, icon: 'MessageSquare', image: 'https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-MH-04', name: 'Sen jako TwÛj najlepszy projekt', description: 'Biohacking nocnej regeneracji.', price: 44, type: ServiceType.ONE_TIME, icon: 'Moon', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-MH-05', name: 'Praca z domu i samotnoúÊ', description: 'Jak budowaÊ relacje w trybie remote.', price: 15, type: ServiceType.ONE_TIME, icon: 'Users', image: 'https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&q=80&w=800', isActive: true },
 
   // --- FINANCE & GROWTH ---
-  { id: 'SRV-FIN-01', name: 'Inwestowanie dla ostro≈ºnych', description: 'Podstawy budowania poduszki finansowej.', price: 28, type: ServiceType.ONE_TIME, icon: 'DollarSign', image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-FIN-02', name: 'Psychologia zakup√≥w online', description: 'Jak nie daƒá siƒô zmanipulowaƒá algorytmom.', price: 7, type: ServiceType.ONE_TIME, icon: 'ShoppingCart', image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-FIN-03', name: 'Negocjacje podwy≈ºki w 2026', description: 'Nowoczesne argumenty oparte na danych.', price: 42, type: ServiceType.ONE_TIME, icon: 'TrendingUp', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-FIN-04', name: 'Personal Branding wewnƒÖtrz firmy', description: 'Jak byƒá widocznym, nie bƒôdƒÖc nachalnym.', price: 19, type: ServiceType.ONE_TIME, icon: 'UserCheck', image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-FIN-05', name: 'Emerytura 2.0', description: 'Zrozumieƒá PPK, IKE i IKZE bez b√≥lu g≈Çowy.', price: 36, type: ServiceType.ONE_TIME, icon: 'Landmark', image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-FIN-01', name: 'Inwestowanie dla ostroønych', description: 'Podstawy budowania poduszki finansowej.', price: 28, type: ServiceType.ONE_TIME, icon: 'DollarSign', image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-FIN-02', name: 'Psychologia zakupÛw online', description: 'Jak nie daÊ siÍ zmanipulowaÊ algorytmom.', price: 7, type: ServiceType.ONE_TIME, icon: 'ShoppingCart', image: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-FIN-03', name: 'Negocjacje podwyøki w 2026', description: 'Nowoczesne argumenty oparte na danych.', price: 42, type: ServiceType.ONE_TIME, icon: 'TrendingUp', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-FIN-04', name: 'Personal Branding wewnπtrz firmy', description: 'Jak byÊ widocznym, nie bÍdπc nachalnym.', price: 19, type: ServiceType.ONE_TIME, icon: 'UserCheck', image: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-FIN-05', name: 'Emerytura 2.0', description: 'ZrozumieÊ PPK, IKE i IKZE bez bÛlu g≥owy.', price: 36, type: ServiceType.ONE_TIME, icon: 'Landmark', image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&q=80&w=800', isActive: true },
 
   // --- LIFESTYLE ---
-  { id: 'SRV-LIFE-01', name: 'Bajka na dobranoc: Robot, kt√≥ry chcia≈Ç mieƒá sny', description: 'Audio dla dzieci pracownik√≥w.', price: 11, type: ServiceType.ONE_TIME, icon: 'Baby', image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-LIFE-01', name: 'Bajka na dobranoc: Robot, ktÛry chcia≥ mieÊ sny', description: 'Audio dla dzieci pracownikÛw.', price: 11, type: ServiceType.ONE_TIME, icon: 'Baby', image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&q=80&w=800', isActive: true },
   { id: 'SRV-LIFE-02', name: 'Kuchnia w 15 minut', description: 'Meal-prep dla zapracowanych.', price: 24, type: ServiceType.ONE_TIME, icon: 'Utensils', image: 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-LIFE-03', name: 'Hobby zamiast scrollowania', description: 'Jak znale≈∫ƒá pasjƒô, kt√≥ra nie wymaga ekranu.', price: 17, type: ServiceType.ONE_TIME, icon: 'Compass', image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-LIFE-04', name: 'Podr√≥≈ºe z nielimitowanym urlopem', description: 'Jak planowaƒá workation.', price: 48, type: ServiceType.ONE_TIME, icon: 'Plane', image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=800', isActive: true },
-  { id: 'SRV-LIFE-05', name: 'Komunikacja miƒôdzy pokoleniami', description: 'Jak dogadaƒá siƒô z Gen Z i Boomerami.', price: 39, type: ServiceType.ONE_TIME, icon: 'Users', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800', isActive: true }
+  { id: 'SRV-LIFE-03', name: 'Hobby zamiast scrollowania', description: 'Jak znaleüÊ pasjÍ, ktÛra nie wymaga ekranu.', price: 17, type: ServiceType.ONE_TIME, icon: 'Compass', image: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-LIFE-04', name: 'PodrÛøe z nielimitowanym urlopem', description: 'Jak planowaÊ workation.', price: 48, type: ServiceType.ONE_TIME, icon: 'Plane', image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=800', isActive: true },
+  { id: 'SRV-LIFE-05', name: 'Komunikacja miÍdzy pokoleniami', description: 'Jak dogadaÊ siÍ z Gen Z i Boomerami.', price: 39, type: ServiceType.ONE_TIME, icon: 'Users', image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800', isActive: true }
 ];
 
 export const INITIAL_TICKETS: SupportTicket[] = [
     {
         id: 'TCK-2025-001',
-        subject: 'B≈ÇƒÖd przy zakupie Spotify',
+        subject: 'B≥πd przy zakupie Spotify',
         category: 'VOUCHER',
         priority: 'NORMAL',
         status: 'OPEN',
@@ -727,7 +811,7 @@ export const INITIAL_TICKETS: SupportTicket[] = [
                 senderId: 'EMP-001',
                 senderName: 'Jan Kowalski',
                 senderRole: Role.EMPLOYEE,
-                message: 'Dzie≈Ñ dobry, pobra≈Ço mi punkty ale nie dosta≈Çem kodu do Spotify. Proszƒô o pomoc.',
+                message: 'DzieÒ dobry, pobra≥o mi punkty ale nie dosta≥em kodu do Spotify. ProszÍ o pomoc.',
                 timestamp: new Date(Date.now() - 86400000).toISOString()
             }
         ]

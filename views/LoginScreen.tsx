@@ -777,7 +777,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
 
             {/* Mobile logo */}
             <div className="flex lg:hidden justify-center" style={{ marginBottom:28 }}>
-              <img src="/logo.png" alt="Logo" style={{ width:72, height:72, objectFit:'contain', borderRadius:16 }}/>
+              <img src="/logo.png" alt="Logo" style={{ width:216, height:216, objectFit:'contain', borderRadius:48 }}/>
             </div>
 
             {/* Card with animated gradient border */}
