@@ -1,28 +1,53 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Commission, Company, Order, Role } from '../types';
 import { SalesStats } from '../components/sales/dashboard/SalesStats';
 import { TeamPerformance } from '../components/sales/dashboard/TeamPerformance';
 import { SalesCommissionTable } from '../components/sales/SalesCommissionTable';
+import { CRMPanel } from '../components/sales/crm/CRMPanel';
+import { CalendarPanel } from '../components/sales/crm/CalendarPanel';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { PageHeader } from '../components/layout/PageHeader';
 import { Tabs } from '../components/ui/Tabs';
-import { LayoutDashboard, DollarSign } from 'lucide-react';
+import { LayoutDashboard, DollarSign, ContactRound, CalendarDays } from 'lucide-react';
 
 interface DashboardSalesProps {
   currentUser: User;
   commissions: Commission[];
   companies: Company[];
   orders: Order[];
-  allUsers: User[]; // Needed for hierarchy view
+  allUsers: User[];
+  currentView?: string;
+  onViewChange?: (view: string) => void;
+  onAddCompany: (data: Partial<Company>) => void;
 }
 
-type Tab = 'OVERVIEW' | 'COMMISSIONS';
+type Tab = 'OVERVIEW' | 'COMMISSIONS' | 'CRM' | 'CALENDAR';
 
 export const DashboardSales: React.FC<DashboardSalesProps> = ({ 
-  currentUser, commissions, companies, orders, allUsers 
+  currentUser, commissions, companies, orders, allUsers, currentView, onViewChange, onAddCompany
 }) => {
-  const [activeTab, setActiveTab] = useState<Tab>('OVERVIEW');
+  const viewToTab = (v?: string): Tab => {
+    if (v === 'sales-commissions') return 'COMMISSIONS';
+    if (v === 'sales-crm') return 'CRM';
+    if (v === 'sales-calendar') return 'CALENDAR';
+    return 'OVERVIEW';
+  };
+  const [activeTab, setActiveTab] = useState<Tab>(() => viewToTab(currentView));
+
+  useEffect(() => {
+    setActiveTab(viewToTab(currentView));
+  }, [currentView]);
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    if (onViewChange) {
+      if (tab === 'COMMISSIONS') onViewChange('sales-commissions');
+      else if (tab === 'CRM') onViewChange('sales-crm');
+      else if (tab === 'CALENDAR') onViewChange('sales-calendar');
+      else onViewChange('sales-dashboard');
+    }
+  };
 
   // Filter data for the current user context
   const myCommissions = commissions.filter(c => c.agentId === currentUser.id);
@@ -54,10 +79,12 @@ export const DashboardSales: React.FC<DashboardSalesProps> = ({
         >
             <Tabs 
                 activeTab={activeTab}
-                onChange={(id) => setActiveTab(id as Tab)}
+                onChange={(id) => handleTabChange(id as Tab)}
                 items={[
                     { id: 'OVERVIEW', label: 'Pulpit', icon: <LayoutDashboard size={16}/> },
-                    { id: 'COMMISSIONS', label: 'Prowizje', icon: <DollarSign size={16}/> }
+                    { id: 'COMMISSIONS', label: 'Prowizje', icon: <DollarSign size={16}/> },
+                    { id: 'CRM', label: 'CRM', icon: <ContactRound size={16}/> },
+                    { id: 'CALENDAR', label: 'Kalendarz', icon: <CalendarDays size={16}/> },
                 ]}
             />
         </PageHeader>
@@ -159,6 +186,28 @@ export const DashboardSales: React.FC<DashboardSalesProps> = ({
         {activeTab === 'COMMISSIONS' && (
             <div className="animate-in slide-in-from-bottom-4 duration-300">
                 <SalesCommissionTable commissions={myCommissions} />
+            </div>
+        )}
+
+        {activeTab === 'CRM' && (
+            <div className="animate-in slide-in-from-bottom-4 duration-300">
+                <CRMPanel
+                    currentUser={currentUser}
+                    myCompanies={myCompanies}
+                    allUsers={allUsers}
+                    orders={orders}
+                    commissions={commissions}
+                    onAddCompany={onAddCompany}
+                />
+            </div>
+        )}
+
+        {activeTab === 'CALENDAR' && (
+            <div className="animate-in slide-in-from-bottom-4 duration-300">
+                <CalendarPanel
+                    currentUser={currentUser}
+                    myCompanies={myCompanies}
+                />
             </div>
         )}
     </div>

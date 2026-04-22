@@ -77,13 +77,22 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
       }, 600);
   };
 
+  const DEMO_CREDENTIALS: Partial<Record<Role, string>> = {
+    [Role.SUPERADMIN]:     'admin',
+    [Role.HR]:             'hr',
+    [Role.EMPLOYEE]:       'jan.kowalski',
+    [Role.ADVISOR]:        'adam.d',
+    [Role.AP_COORDINATOR]: 'koordynator',
+    [Role.AP_WORKER]:      'ap.pracownik',
+  };
+
   const selectDemoUser = (role: Role) => {
-      const demoUser = users.find(u => u.role === role && u.status === 'ACTIVE');
-      if (demoUser) {
-          const identifier = demoUser.username || demoUser.email;
-          setEmail(identifier);
-          setShowDropdown(false);
-      }
+    const identifier = DEMO_CREDENTIALS[role];
+    if (identifier) {
+      setEmail(identifier);
+      setPassword('123');
+      setShowDropdown(false);
+    }
   };
 
   const TICKER = ['🎁 Vouchery','💪 Siłownia','🎬 Kino','✈️ Podróże','🛒 Zakupy','☕ Kawiarnie','🏥 Zdrowie','🎵 Muzyka','🎮 Gaming','🌿 Wellness','💆 Masaże','🚴 Rower'];
@@ -133,8 +142,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
         .ebs-up        { animation: ebs-up 0.7s cubic-bezier(.22,1,.36,1) both; }
         .ebs-spin      { animation: ebs-spin 0.9s linear infinite; }
         .ebs-input {
-          width:100%; padding:14px 16px 14px 44px;
-          border-radius:14px; font-size:14px; color:#fff; outline:none;
+          width:100%; padding:10px 14px 10px 40px;
+          border-radius:12px; font-size:13px; color:#fff; outline:none;
           background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.08);
           transition: border-color .2s, box-shadow .2s;
         }
@@ -229,7 +238,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
 
             {/* Headline */}
             <div className="ebs-up" style={{ animationDelay:'.2s', textAlign:'center', marginBottom:10 }}>
-              <h1 style={{ fontSize:52, fontWeight:900, lineHeight:1, letterSpacing:'-1px', background:'linear-gradient(135deg,#fff 0%,#bfdbfe 40%,#93c5fd 65%,#60a5fa 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
+              <h1 style={{ fontSize:34, fontWeight:900, lineHeight:1, letterSpacing:'-1px', background:'linear-gradient(135deg,#fff 0%,#bfdbfe 40%,#93c5fd 65%,#60a5fa 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>
                 BALTIC<br/>BENEFITS<br/>SYSTEM
               </h1>
             </div>
@@ -268,7 +277,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
 
         {/* ═══════════════════════════════ RIGHT — FORM OVERLAY ═══════════════════════════════ */}
         <div className="ebs-form-panel">
-          <div style={{ width:'100%', maxWidth:440, position:'relative', zIndex:10 }}>
+<div style={{ width:'100%', maxWidth:360, position:'relative', zIndex:10 }}>
 
             {/* Mobile logo */}
             <div className="flex lg:hidden justify-center" style={{ marginBottom:28 }}>
@@ -276,12 +285,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
             </div>
 
             {/* Card */}
-            <div style={{ borderRadius:26, background:'rgba(5,10,22,0.97)', backdropFilter:'blur(24px)', boxShadow:'0 32px 80px rgba(0,0,0,.7), 0 0 120px rgba(37,99,235,.06)', overflow:'hidden' }}>
+            <div style={{ borderRadius:26, background:'rgba(5,10,22,0.97)', backdropFilter:'blur(24px)', boxShadow:'0 32px 80px rgba(0,0,0,.7), 0 0 120px rgba(37,99,235,.06)', overflow:'visible' }}>
 
                   {/* Top shimmer line */}
-                  <div style={{ height:2, borderRadius:'26px 26px 0 0', background:'linear-gradient(90deg,#2563eb,#0891b2,#10b981,#059669,#0284c7,#2563eb)', backgroundSize:'300% 100%', animation:'ebs-grad 4s ease infinite' }}/>
+                  <div style={{ height:2, borderRadius:'26px 26px 0 0', background:'linear-gradient(90deg,#2563eb,#0891b2,#10b981,#059669,#0284c7,#2563eb)', backgroundSize:'300% 100%', animation:'ebs-grad 4s ease infinite', overflow:'hidden' }}/>
 
-                  <div style={{ padding:'28px 24px 32px', overflow:'visible', position:'relative' }}>
+                  <div style={{ padding:'22px 20px 26px', overflow:'visible', position:'relative' }}>
                     {step === 'CREDENTIALS' && (
                       <div className="ebs-up" style={{ animationDelay:'0s' }}>
 
@@ -291,7 +300,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
                             <div style={{ width:8, height:8, borderRadius:'50%', background:'#10b981', animation:'ebs-ping 2s ease infinite' }}/>
                             <span style={{ color:'#6ee7b7', fontSize:11, fontWeight:700, letterSpacing:'0.2em', textTransform:'uppercase' }}>Bezpieczne połączenie</span>
                           </div>
-                          <h2 style={{ fontSize:30, fontWeight:900, color:'#fff', marginBottom:6, letterSpacing:'-0.5px' }}>Witaj z powrotem 👋</h2>
+                          <h2 style={{ fontSize:24, fontWeight:400, color:'#fff', marginBottom:6, letterSpacing:'-0.5px' }}>Witaj z powrotem</h2>
                           <p style={{ color:'rgba(255,255,255,0.35)', fontSize:14 }}>Zaloguj się, żeby sprawdzić swoje benefity.</p>
                         </div>
 
@@ -320,22 +329,27 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
                               {showDropdown && (
                                 <div style={{ position:'absolute', top:'calc(100% + 6px)', left:0, right:0, background:'rgba(10,15,35,0.98)', border:'1.5px solid rgba(37,99,235,0.4)', borderRadius:14, overflow:'hidden', zIndex:100, boxShadow:'0 20px 60px rgba(0,0,0,0.6)' }}>
                                   {[
-                                    {label:'Admin (2FA)', role: Role.SUPERADMIN, sub:'admin'},
-                                    {label:'HR Manager', role: Role.HR, sub:'hr'},
-                                    {label:'Pracownik', role: Role.EMPLOYEE, sub:'jan.kowalski'},
-                                    {label:'Sprzedaż', role: Role.ADVISOR, sub:'adam.d'}
-                                  ].map((item, idx) => (
+                                    {label:'Admin (2FA)', role: Role.SUPERADMIN, sub:'admin', color:'#f59e0b'},
+                                    {label:'HR Manager', role: Role.HR, sub:'hr', color:'#60a5fa'},
+                                    {label:'Pracownik', role: Role.EMPLOYEE, sub:'jan.kowalski', color:'#a78bfa'},
+                                    {label:'Sprzedaż', role: Role.ADVISOR, sub:'adam.d', color:'#34d399'},
+                                    {label:'Koordynator AP', role: Role.AP_COORDINATOR, sub:'koordynator', color:'#fb923c'},
+                                    {label:'Pracownik AP', role: Role.AP_WORKER, sub:'ap.pracownik', color:'#4ade80'}
+                                  ].map((item, idx, arr) => (
                                     <button
                                       key={item.role}
                                       type="button"
                                       onMouseDown={(e)=>{e.preventDefault();selectDemoUser(item.role);}}
-                                      style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', background:'none', border:'none', borderBottom: idx<3 ? '1px solid rgba(255,255,255,0.04)' : 'none', cursor:'pointer', textAlign:'left' as const }}
+                                      style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'11px 16px', background:'none', border:'none', borderBottom: idx<arr.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none', cursor:'pointer', textAlign:'left' as const }}
                                       onMouseEnter={e=>(e.currentTarget.style.background='rgba(37,99,235,0.15)')}
                                       onMouseLeave={e=>(e.currentTarget.style.background='none')}
                                     >
-                                      <div>
-                                        <span style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.85)', display:'block' }}>{item.label}</span>
-                                        <span style={{ fontSize:11, color:'rgba(255,255,255,0.35)' }}>{item.sub} · hasło: 123</span>
+                                      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                                        <div style={{ width:6, height:6, borderRadius:'50%', background: item.color, flexShrink:0 }}/>
+                                        <div>
+                                          <span style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.85)', display:'block' }}>{item.label}</span>
+                                          <span style={{ fontSize:11, color:'rgba(255,255,255,0.35)' }}>{item.sub} · hasło: 123</span>
+                                        </div>
                                       </div>
                                       <ArrowRight size={14} style={{ color:'rgba(255,255,255,0.25)', flexShrink:0 }}/>
                                     </button>
@@ -369,7 +383,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ users, onLogin }) => {
                           )}
 
                           {/* Submit */}
-                          <button type="submit" disabled={isLoading} className="ebs-btn" style={{ width:'100%', padding:'15px', borderRadius:16, fontSize:15, fontWeight:900, color:'#fff', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:10, letterSpacing:'0.02em', marginTop:4 }}>
+                          <button type="submit" disabled={isLoading} className="ebs-btn" style={{ width:'100%', padding:'12px', borderRadius:14, fontSize:14, fontWeight:900, color:'#fff', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:10, letterSpacing:'0.02em', marginTop:4 }}>
                             {isLoading ? (
                               <><span className="ebs-spin" style={{ width:18, height:18, border:'2.5px solid rgba(255,255,255,0.3)', borderTopColor:'#fff', borderRadius:'50%', display:'inline-block' }}/> Autoryzacja...</>
                             ) : (

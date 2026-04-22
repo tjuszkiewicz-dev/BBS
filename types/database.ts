@@ -8,7 +8,14 @@ export type DbRole =
   | 'pracownik'
   | 'partner'
   | 'menedzer'
-  | 'dyrektor';
+  | 'dyrektor'
+  | 'ap_worker'
+  | 'ap_coordinator';
+
+// ── AP Module types ──────────────────────────────────────────────────────────
+export type ApWorkerStatus    = 'active' | 'inactive';
+export type WorkSessionStatus = 'active' | 'completed' | 'corrected';
+export type ApLanguage        = 'pl' | 'en' | 'uk' | 'ru' | 'es';
 
 export type VoucherStatus =
   | 'created'
@@ -602,6 +609,221 @@ export interface Database {
           new_data?:   unknown | null;
           created_at?: string;
         };
+        Relationships: [];
+      };
+
+      // ── AP Module ──────────────────────────────────────────────────────────
+
+      ap_coordinators: {
+        Row: {
+          id:         string;
+          user_id:    string;
+          first_name: string;
+          last_name:  string;
+          email:      string;
+          phone:      string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?:         string;
+          user_id:     string;
+          first_name:  string;
+          last_name:   string;
+          email:       string;
+          phone?:      string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?:         string;
+          user_id?:    string;
+          first_name?: string;
+          last_name?:  string;
+          email?:      string;
+          phone?:      string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+
+      ap_workers: {
+        Row: {
+          id:                     string;
+          user_id:                string | null;
+          coordinator_id:         string;
+          first_name:             string;
+          last_name:              string;
+          pesel_encrypted:        string | null;
+          bank_account_encrypted: string | null;
+          address:                string | null;
+          email:                  string;
+          phone:                  string | null;
+          nationality:            string;
+          language:               ApLanguage;
+          hourly_rate:            number;
+          status:                 ApWorkerStatus;
+          created_at:             string;
+          updated_at:             string;
+        };
+        Insert: {
+          id?:                     string;
+          user_id?:                string | null;
+          coordinator_id:          string;
+          first_name:              string;
+          last_name:               string;
+          pesel_encrypted?:        string | null;
+          bank_account_encrypted?: string | null;
+          address?:                string | null;
+          email:                   string;
+          phone?:                  string | null;
+          nationality?:            string;
+          language?:               ApLanguage;
+          hourly_rate?:            number;
+          status?:                 ApWorkerStatus;
+          created_at?:             string;
+          updated_at?:             string;
+        };
+        Update: {
+          user_id?:                string | null;
+          coordinator_id?:         string;
+          first_name?:             string;
+          last_name?:              string;
+          pesel_encrypted?:        string | null;
+          bank_account_encrypted?: string | null;
+          address?:                string | null;
+          email?:                  string;
+          phone?:                  string | null;
+          nationality?:            string;
+          language?:               ApLanguage;
+          hourly_rate?:            number;
+          status?:                 ApWorkerStatus;
+          updated_at?:             string;
+        };
+        Relationships: [];
+      };
+
+      work_schedules: {
+        Row: {
+          id:                 string;
+          worker_id:          string;
+          coordinator_id:     string;
+          date:               string;
+          location_name:      string;
+          address:            string | null;
+          planned_start_time: string | null;
+          notes:              string | null;
+          created_at:         string;
+          updated_at:         string;
+        };
+        Insert: {
+          id?:                 string;
+          worker_id:           string;
+          coordinator_id:      string;
+          date:                string;
+          location_name:       string;
+          address?:            string | null;
+          planned_start_time?: string | null;
+          notes?:              string | null;
+          created_at?:         string;
+          updated_at?:         string;
+        };
+        Update: {
+          worker_id?:          string;
+          coordinator_id?:     string;
+          date?:               string;
+          location_name?:      string;
+          address?:            string | null;
+          planned_start_time?: string | null;
+          notes?:              string | null;
+          updated_at?:         string;
+        };
+        Relationships: [];
+      };
+
+      work_sessions: {
+        Row: {
+          id:              string;
+          worker_id:       string;
+          schedule_id:     string | null;
+          date:            string;
+          start_time:      string;
+          end_time:        string | null;
+          total_minutes:   number | null;
+          status:          WorkSessionStatus;
+          correction_note: string | null;
+          corrected_by:    string | null;
+          created_at:      string;
+        };
+        Insert: {
+          id?:              string;
+          worker_id:        string;
+          schedule_id?:     string | null;
+          date?:            string;
+          start_time?:      string;
+          end_time?:        string | null;
+          status?:          WorkSessionStatus;
+          correction_note?: string | null;
+          corrected_by?:    string | null;
+          created_at?:      string;
+        };
+        Update: {
+          end_time?:        string | null;
+          status?:          WorkSessionStatus;
+          correction_note?: string | null;
+          corrected_by?:    string | null;
+        };
+        Relationships: [];
+      };
+
+      payroll_records: {
+        Row: {
+          id:            string;
+          worker_id:     string;
+          month:         string;
+          total_minutes: number;
+          hourly_rate:   number;
+          total_amount:  number;
+          generated_by:  string | null;
+          generated_at:  string;
+          pdf_url:       string | null;
+        };
+        Insert: {
+          id?:            string;
+          worker_id:      string;
+          month:          string;
+          total_minutes:  number;
+          hourly_rate:    number;
+          generated_by?:  string | null;
+          generated_at?:  string;
+          pdf_url?:       string | null;
+        };
+        Update: {
+          pdf_url?: string | null;
+        };
+        Relationships: [];
+      };
+
+      ap_audit_log: {
+        Row: {
+          id:          string;
+          actor_id:    string | null;
+          action:      string;
+          entity_type: string;
+          entity_id:   string | null;
+          payload:     unknown | null;
+          created_at:  string;
+        };
+        Insert: {
+          id?:          string;
+          actor_id?:    string | null;
+          action:       string;
+          entity_type:  string;
+          entity_id?:   string | null;
+          payload?:     unknown | null;
+          created_at?:  string;
+        };
+        Update: Record<string, never>;
         Relationships: [];
       };
     };

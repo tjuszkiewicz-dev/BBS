@@ -3,11 +3,13 @@ import React, { createContext, useContext, useState, ReactNode, useCallback, use
 import { 
   User, Voucher, Company, Order, BuybackAgreement, AuditLogEntry, 
   Commission, QuarterlyPerformance, Notification, NotificationConfig, ServiceItem, Transaction,
-  SystemConfig, ImportHistoryEntry, PayrollEntry, NotificationAction, UserFinance, SupportTicket, TicketMessage, TicketCategory, TicketPriority, Role, TicketStatus, DistributionBatch
+  SystemConfig, ImportHistoryEntry, PayrollEntry, NotificationAction, UserFinance, SupportTicket, TicketMessage, TicketCategory, TicketPriority, Role, TicketStatus, DistributionBatch,
+  CRMContact, CRMDeal, CRMActivity, CRMDealStage, CRMActivityType, CRMDealStageHistoryEntry
 } from '../types';
 import { 
   INITIAL_AUDIT_LOGS, 
-  INITIAL_SERVICES, INITIAL_SYSTEM_CONFIG, INITIAL_TICKETS
+  INITIAL_SERVICES, INITIAL_SYSTEM_CONFIG, INITIAL_TICKETS,
+  INITIAL_CRM_CONTACTS, INITIAL_CRM_DEALS, INITIAL_CRM_ACTIVITIES
 } from '../services/mockData';
 import { ToastMessage, ToastType } from '../components/Toast';
 import { generatePayrollTemplate, parseAndMatchPayroll, generateUUID } from '../services/payrollService';
@@ -49,10 +51,13 @@ interface StrattonContextType {
     services: ServiceItem[];
     transactions: Transaction[];
     importHistory: ImportHistoryEntry[];
-    distributionBatches: DistributionBatch[]; // NEW: Exported to state
+    distributionBatches: DistributionBatch[];
     systemConfig: SystemConfig;
     toasts: ToastMessage[];
-    tickets: SupportTicket[]; 
+    tickets: SupportTicket[];
+    crmContacts: CRMContact[];
+    crmDeals: CRMDeal[];
+    crmActivities: CRMActivity[];
   };
   actions: {
     login: (userId: string) => void; 
@@ -88,6 +93,16 @@ interface StrattonContextType {
     handleResolveIbanChange: (userId: string, approved: boolean, rejectionReason?: string) => void;
     handleManageService: (action: 'ADD' | 'UPDATE' | 'DELETE', service: ServiceItem) => void;
     handleCreateTicket: (subject: string, category: TicketCategory, priority: TicketPriority, message: string, relatedEntityId?: string) => void;
+    // CRM actions
+    handleAddCrmContact: (data: Omit<CRMContact, 'id' | 'createdAt' | 'createdBy'>) => void;
+    handleUpdateCrmContact: (id: string, data: Partial<CRMContact>) => void;
+    handleDeleteCrmContact: (id: string) => void;
+    handleAddCrmDeal: (data: Omit<CRMDeal, 'id' | 'createdAt' | 'updatedAt'>) => void;
+    handleUpdateCrmDeal: (id: string, data: Partial<CRMDeal>) => void;
+    handleDeleteCrmDeal: (id: string) => void;
+    handleAddCrmActivity: (data: Omit<CRMActivity, 'id' | 'createdAt'>) => void;
+    handleUpdateCrmActivity: (id: string, data: Partial<CRMActivity>) => void;
+    handleDeleteCrmActivity: (id: string) => void;
     handleReplyTicket: (ticketId: string, message: string) => void;
     handleUpdateTicketStatus: (ticketId: string, status: TicketStatus) => void;
     handleAnonymizeUser: (userId: string) => void;
@@ -105,9 +120,12 @@ export const StrattonProvider = ({ children }: { children?: ReactNode }) => {
 
   const [systemConfig, setSystemConfig] = usePersistedState<SystemConfig>('ebs_sys_config_v1', INITIAL_SYSTEM_CONFIG);
   const [auditLogs, setAuditLogs] = usePersistedState<AuditLogEntry[]>('ebs_audit_logs_v1', INITIAL_AUDIT_LOGS);
-  const [services, setServices] = usePersistedState<ServiceItem[]>('ebs_services_v16', INITIAL_SERVICES);
+  const [services, setServices] = usePersistedState<ServiceItem[]>('ebs_services_v17', INITIAL_SERVICES);
   const [quarterlyStats, setQuarterlyStats] = useState<QuarterlyPerformance[]>([]);
   const [tickets, setTickets] = usePersistedState<SupportTicket[]>('ebs_tickets_v1', INITIAL_TICKETS);
+  const [crmContacts, setCrmContacts] = usePersistedState<CRMContact[]>('bbs_crm_contacts_v1', INITIAL_CRM_CONTACTS);
+  const [crmDeals, setCrmDeals] = usePersistedState<CRMDeal[]>('bbs_crm_deals_v1', INITIAL_CRM_DEALS);
+  const [crmActivities, setCrmActivities] = usePersistedState<CRMActivity[]>('bbs_crm_activities_v1', INITIAL_CRM_ACTIVITIES);
 
   // FORCE UPDATE SERVICES IF NEEDED
   React.useEffect(() => {
@@ -347,6 +365,73 @@ export const StrattonProvider = ({ children }: { children?: ReactNode }) => {
       notifLogic.addToast("Bezpieczeństwo", `2FA zostało ${enabled ? 'aktywowane' : 'dezaktywowane'}.`, "SUCCESS");
   }, [userLogic.setUsers, logEvent, notifLogic.addToast]);
 
+  // --- CRM CALLBACKS ---
+  const handleAddCrmContact = useCallback((data: Omit<CRMContact, 'id' | 'createdAt' | 'createdBy'>) => {
+    if (!currentUser) return;
+    const newContact: CRMContact = {
+      ...data,
+      id: `CRMCON-${generateUUID()}`,
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser.id,
+    };
+    setCrmContacts(prev => [newContact, ...prev]);
+  }, [currentUser, setCrmContacts]);
+
+  const handleUpdateCrmContact = useCallback((id: string, data: Partial<CRMContact>) => {
+    setCrmContacts(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
+  }, [setCrmContacts]);
+
+  const handleDeleteCrmContact = useCallback((id: string) => {
+    setCrmContacts(prev => prev.filter(c => c.id !== id));
+  }, [setCrmContacts]);
+
+  const handleAddCrmDeal = useCallback((data: Omit<CRMDeal, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const now = new Date().toISOString();
+    const newDeal: CRMDeal = {
+      ...data,
+      id: `CRMDEAL-${generateUUID()}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    setCrmDeals(prev => [newDeal, ...prev]);
+  }, [setCrmDeals]);
+
+  const handleUpdateCrmDeal = useCallback((id: string, data: Partial<CRMDeal>) => {
+    setCrmDeals(prev => prev.map(d => {
+      if (d.id !== id) return d;
+      const updated = { ...d, ...data, updatedAt: new Date().toISOString() };
+      if (data.stage && data.stage !== d.stage) {
+        const entry: CRMDealStageHistoryEntry = {
+          stage: data.stage,
+          changedAt: new Date().toISOString(),
+        };
+        updated.stageHistory = [...(d.stageHistory || [{ stage: d.stage, changedAt: d.createdAt }]), entry];
+      }
+      return updated;
+    }));
+  }, [setCrmDeals]);
+
+  const handleDeleteCrmDeal = useCallback((id: string) => {
+    setCrmDeals(prev => prev.filter(d => d.id !== id));
+  }, [setCrmDeals]);
+
+  const handleAddCrmActivity = useCallback((data: Omit<CRMActivity, 'id' | 'createdAt'>) => {
+    const newActivity: CRMActivity = {
+      ...data,
+      id: `CRMACT-${generateUUID()}`,
+      createdAt: new Date().toISOString(),
+    };
+    setCrmActivities(prev => [newActivity, ...prev]);
+  }, [setCrmActivities]);
+
+  const handleUpdateCrmActivity = useCallback((id: string, data: Partial<CRMActivity>) => {
+    setCrmActivities(prev => prev.map(a => a.id === id ? { ...a, ...data } : a));
+  }, [setCrmActivities]);
+
+  const handleDeleteCrmActivity = useCallback((id: string) => {
+    setCrmActivities(prev => prev.filter(a => a.id !== id));
+  }, [setCrmActivities]);
+
   // --- MEMOIZED VALUE TO PREVENT UNNECESSARY RENDERS ---
   const contextValue = useMemo(() => ({
     state: {
@@ -367,7 +452,10 @@ export const StrattonProvider = ({ children }: { children?: ReactNode }) => {
       distributionBatches: voucherLogic.distributionBatches,
       systemConfig,
       toasts: notifLogic.toasts,
-      tickets 
+      tickets,
+      crmContacts,
+      crmDeals,
+      crmActivities,
     },
     actions: {
       login,
@@ -407,6 +495,15 @@ export const StrattonProvider = ({ children }: { children?: ReactNode }) => {
       handleUpdateTicketStatus,
       handleAnonymizeUser: userLogic.handleAnonymizeUser,
       handleToggleTwoFactor,
+      handleAddCrmContact,
+      handleUpdateCrmContact,
+      handleDeleteCrmContact,
+      handleAddCrmDeal,
+      handleUpdateCrmDeal,
+      handleDeleteCrmDeal,
+      handleAddCrmActivity,
+      handleUpdateCrmActivity,
+      handleDeleteCrmActivity,
       addToast: notifLogic.addToast,
       removeToast: notifLogic.removeToast
     }
@@ -414,6 +511,7 @@ export const StrattonProvider = ({ children }: { children?: ReactNode }) => {
     currentUser, userLogic.users, voucherLogic.vouchers, orderLogic.companies, orderLogic.orders, voucherLogic.buybacks,
     auditLogs, orderLogic.commissions, quarterlyStats, notifLogic.notifications, notifLogic.notificationConfigs,
     services, voucherLogic.transactions, userLogic.importHistory, voucherLogic.distributionBatches, systemConfig, notifLogic.toasts, tickets,
+    crmContacts, crmDeals, crmActivities,
     login, logout, switchUser, userLogic.setUsers, handleUpdateSystemConfig, notifLogic.handleUpdateNotificationConfig, handleUpdateCompanyConfig,
     orderLogic.handleAddCompany, orderLogic.handleCrmSync, voucherLogic.handleManualEmission, orderLogic.handlePlaceOrder, orderLogic.handleApproveOrder,
     orderLogic.handleBankPayment, voucherLogic.handleDistribute, voucherLogic.handleBulkDistribute, userLogic.handleDeactivateEmployee,
@@ -422,6 +520,8 @@ export const StrattonProvider = ({ children }: { children?: ReactNode }) => {
     notifLogic.handleMarkSingleNotificationRead, handleExportPayrollTemplate, handleParseAndMatchPayroll, handleNotificationAction,
     notifLogic.handleClearNotifications, userLogic.handleUpdateUserFinance, userLogic.handleRequestIbanChange, userLogic.handleResolveIbanChange,
     handleManageService, handleCreateTicket, handleReplyTicket, handleUpdateTicketStatus, userLogic.handleAnonymizeUser, handleToggleTwoFactor,
+    handleAddCrmContact, handleUpdateCrmContact, handleDeleteCrmContact, handleAddCrmDeal, handleUpdateCrmDeal, handleDeleteCrmDeal,
+    handleAddCrmActivity, handleUpdateCrmActivity, handleDeleteCrmActivity,
     notifLogic.addToast, notifLogic.removeToast
   ]);
 

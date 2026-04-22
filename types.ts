@@ -38,7 +38,10 @@ export enum Role {
   // Struktura Sprzedaży
   DIRECTOR = 'DIRECTOR', // Dyrektor Handlowy
   MANAGER = 'MANAGER',   // Manager
-  ADVISOR = 'ADVISOR'    // Doradca
+  ADVISOR = 'ADVISOR',   // Doradca
+  // Moduł Agencji Pracy
+  AP_WORKER = 'AP_WORKER',           // Pracownik AP
+  AP_COORDINATOR = 'AP_COORDINATOR'  // Koordynator AP
 }
 
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'ANONYMIZED';
@@ -609,3 +612,69 @@ export interface ImportHistoryEntry {
   status: 'SUCCESS' | 'PARTIAL' | 'ERROR';
   reportData: any; 
 }
+
+// ─────────────────────────────────────────────
+// CRM MODULE TYPES
+// ─────────────────────────────────────────────
+
+export type CRMDealStage =
+  | 'LEAD'          // Nowy lead, brak kontaktu
+  | 'CONTACT'       // Nawiązano kontakt
+  | 'OFFER'         // Wysłano ofertę
+  | 'NEGOTIATION'   // W trakcie negocjacji
+  | 'WON'           // Wygrany
+  | 'LOST';         // Przegrany
+
+export type CRMActivityType = 'NOTE' | 'CALL' | 'EMAIL' | 'MEETING' | 'TASK';
+
+export interface CRMContact {
+  id: string;
+  companyId: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  position?: string;       // Stanowisko
+  isPrimary?: boolean;     // Główny kontakt w firmie
+  createdAt: string;
+  createdBy: string;       // userId agenta
+}
+
+export interface CRMDealStageHistoryEntry {
+  stage: CRMDealStage;
+  changedAt: string;
+  changedBy?: string;
+}
+
+export interface CRMDeal {
+  id: string;
+  companyId: string;
+  title: string;
+  value?: number;          // Szacowana wartość kontraktu (PLN)
+  stage: CRMDealStage;
+  agentId: string;         // Odpowiedzialny handlowiec
+  contactId?: string;      // Powiązany kontakt (twarda relacja)
+  probability?: number;    // Prawdopodobieństwo zamknięcia (0-100%)
+  expectedCloseDate?: string;
+  closedAt?: string;
+  lostReason?: string;
+  stageHistory?: CRMDealStageHistoryEntry[];  // Historia zmian etapów
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CRMActivity {
+  id: string;
+  companyId?: string;
+  dealId?: string;
+  contactId?: string;
+  type: CRMActivityType;
+  title: string;
+  body?: string;            // Treść notatki / opis
+  authorId: string;         // userId autora
+  authorName: string;
+  dueDate?: string;         // Dla zadań (TASK)
+  isDone?: boolean;         // Dla zadań
+  createdAt: string;
+}
+

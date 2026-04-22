@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Montserrat', 'sans-serif'],
         serif: ['Libre Baskerville', 'serif'],
         script: ['cursive'], // Fallback for signatures
       },

@@ -10,7 +10,7 @@ import { useStrattonSystem } from '../../context/StrattonContext';
 // Configuration for API Endpoint
 const API_BASE_URL = (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) 
   ? process.env.REACT_APP_API_URL 
-  : 'http://localhost:3001';
+  : 'http://localhost:3003';
 
 interface DocumentDownloadButtonProps {
   docName: string;

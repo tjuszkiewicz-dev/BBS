@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Role, User } from '../types';
-import { LayoutDashboard, Users, FileText, Wallet, ShieldCheck, DollarSign, X, ChevronRight, LogOut, BarChart3, Settings2, FolderOpen, HelpCircle, Grid } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Wallet, ShieldCheck, DollarSign, X, ChevronRight, LogOut, BarChart3, Settings2, FolderOpen, HelpCircle, Grid, Kanban, CalendarDays } from 'lucide-react';
 
 interface SidebarProps {
   currentUser: User;
@@ -65,6 +65,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return [
           { id: 'sales-dashboard', label: 'Panel Sprzedaży', icon: <DollarSign size={20} /> },
           { id: 'sales-commissions', label: 'Moje Prowizje', icon: <FileText size={20} /> },
+          { id: 'sales-crm', label: 'CRM', icon: <Kanban size={20} /> },
+          { id: 'sales-calendar', label: 'Kalendarz', icon: <CalendarDays size={20} /> },
         ];
       default:
         return [];

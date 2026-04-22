@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ServiceItem } from '../../../types';
-import { Wifi, Smartphone, Heart, ArrowRight, Zap, Globe, Shield } from 'lucide-react';
+import { Wifi, Smartphone, Heart, ArrowRight, Globe, Shield } from 'lucide-react';
 
 interface OrangeOfferSectionProps {
     services: ServiceItem[];
@@ -9,8 +9,10 @@ interface OrangeOfferSectionProps {
 
 type OrangeTab = 'ALL' | 'INTERNET' | 'ABONAMENT' | 'LOVE';
 
-const SERVICE_META: Record<string, { category: string; badge?: string; highlight?: boolean; icon: React.ReactNode; specs: string[]; extras?: string[] }> = {
+const SERVICE_META: Record<string, { name: string; description: string; category: string; badge?: string; highlight?: boolean; icon: React.ReactNode; specs: string[]; extras?: string[] }> = {
     'SRV-ORANGE-FIBER': {
+        name: 'Światłowód Pro 2.0',
+        description: 'Super szybki internet światłowodowy do Twojego domu.',
         category: 'Internet domowy',
         badge: 'BESTSELLER',
         icon: <Wifi size={22} />,
@@ -18,6 +20,8 @@ const SERVICE_META: Record<string, { category: string; badge?: string; highlight
         extras: ['Brak limitu danych', 'Instalacja w 48h'],
     },
     'SRV-ORANGE-GSM': {
+        name: 'Plan Firmowy L',
+        description: 'Nielimitowane rozmowy i SMSy, duży pakiet danych.',
         category: 'Abonament komórkowy',
         highlight: true,
         icon: <Smartphone size={22} />,
@@ -25,6 +29,8 @@ const SERVICE_META: Record<string, { category: string; badge?: string; highlight
         extras: ['Rozmowy bez limitu', 'SMS/MMS bez limitu', 'Roaming UE', 'eSIM'],
     },
     'SRV-ORANGE-LOVE': {
+        name: 'Orange Love Mini',
+        description: 'Pakiet usług dla całej rodziny w jednej cenie.',
         category: 'Pakiet rodzinny',
         badge: 'OSZCZĘDZASZ',
         icon: <Heart size={22} />,
@@ -55,7 +61,7 @@ export const OrangeOfferSection: React.FC<OrangeOfferSectionProps> = ({ services
 
     return (
         <div className="mb-8 font-sans">
-            {/* ── HERO HEADER ─────────────────────────────────────── */}
+            {/* HERO HEADER */}
             <div className="relative rounded-t-2xl overflow-hidden bg-[#FF6600]" style={{ minHeight: 180 }}>
                 {/* Decorative circles */}
                 <div className="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-white/10 pointer-events-none" />
@@ -104,7 +110,7 @@ export const OrangeOfferSection: React.FC<OrangeOfferSectionProps> = ({ services
                 </svg>
             </div>
 
-            {/* ── CONTENT AREA ────────────────────────────────────── */}
+            {/* CONTENT AREA */}
             <div className="bg-white rounded-b-2xl border border-t-0 border-slate-200 shadow-sm px-8 pt-6 pb-8">
                 {/* Tabs */}
                 <div className="flex gap-1 mb-7 bg-slate-100 rounded-xl p-1 w-fit">
@@ -132,7 +138,7 @@ export const OrangeOfferSection: React.FC<OrangeOfferSectionProps> = ({ services
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     {filteredServices.map(service => {
                         const meta = SERVICE_META[service.id] ?? {
-                            category: 'Usługa', icon: <Globe size={22} />, specs: [], extras: [],
+                            name: service.name, description: service.description, category: 'Usługa', badge: undefined, highlight: false, icon: <Globe size={22} />, specs: [], extras: [],
                         };
                         const isHighlighted = meta.highlight;
 
@@ -158,7 +164,7 @@ export const OrangeOfferSection: React.FC<OrangeOfferSectionProps> = ({ services
                                         <div>
                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{meta.category}</span>
                                             <h3 className={`text-xl font-black mt-0.5 leading-tight ${isHighlighted ? 'text-[#FF6600]' : 'text-slate-900'}`}>
-                                                {service.name}
+                                                {meta.name}
                                             </h3>
                                         </div>
                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ml-3 ${
@@ -176,7 +182,7 @@ export const OrangeOfferSection: React.FC<OrangeOfferSectionProps> = ({ services
                                     )}
 
                                     {/* Description */}
-                                    <p className="text-slate-500 text-sm leading-relaxed mb-5">{service.description}</p>
+                                    <p className="text-slate-500 text-sm leading-relaxed mb-5">{meta.description}</p>
 
                                     {/* Specs */}
                                     <ul className="space-y-2.5 mb-5 flex-1">

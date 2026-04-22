@@ -6,12 +6,14 @@ import { Role } from '../types';
 
 /** Map each role to the URL-prefix it is allowed to reach. */
 const VIEW_PREFIX: Record<Role, string> = {
-  [Role.SUPERADMIN]: 'admin-',
-  [Role.HR]:         'hr-',
-  [Role.EMPLOYEE]:   'emp-',
-  [Role.DIRECTOR]:   'sales-',
-  [Role.MANAGER]:    'sales-',
-  [Role.ADVISOR]:    'sales-',
+  [Role.SUPERADMIN]:      'admin-',
+  [Role.HR]:              'hr-',
+  [Role.EMPLOYEE]:        'emp-',
+  [Role.DIRECTOR]:        'sales-',
+  [Role.MANAGER]:         'sales-',
+  [Role.ADVISOR]:         'sales-',
+  [Role.AP_COORDINATOR]:  'ap-coord-',
+  [Role.AP_WORKER]:       'ap-worker-',
 };
 
 /**

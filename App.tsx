@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
-import { DashboardSuperadmin } from './views/DashboardSuperadmin';
-import { DashboardHR } from './views/DashboardHR';
+import { DashboardAdminNew } from './views/DashboardAdminNew';
+import { DashboardNewHR } from './views/DashboardNewHR';
 import { DashboardEmployee } from './views/DashboardEmployee';
 import { DashboardSales } from './views/DashboardSales';
+import { DashboardAPCoordinator } from './views/DashboardAPCoordinator';
+import { DashboardAPWorker } from './views/DashboardAPWorker';
 import { LoginScreen } from './views/LoginScreen';
 import { Role, Order, BuybackAgreement, Notification, User, Company, DistributionBatch, VoucherStatus } from './types'; 
 import { Menu, Check, X, DollarSign, LogOut, Search, ShieldCheck, Settings, Wallet, Clock } from 'lucide-react';
@@ -13,7 +15,7 @@ import { ToastContainer } from './components/Toast';
 import { NotificationCenter } from './components/notifications/NotificationCenter';
 import { NotificationHistoryModal } from './components/notifications/NotificationHistoryModal';
 import { StrattonProvider, useStrattonSystem } from './context/StrattonContext';
-import { UserInspectionModal } from './components/admin/modals/UserInspectionModal';
+import { UserInspectionModal } from './components/adminNew/UserInspectionModal';
 import { GlobalSearch } from './components/GlobalSearch'; 
 import { SessionGuard } from './components/security/SessionGuard'; 
 import { EmployeeSettingsModal } from './components/employee/EmployeeSettingsModal';
@@ -58,6 +60,8 @@ const AppContent = () => {
           case Role.ADVISOR:
           case Role.MANAGER:
           case Role.DIRECTOR: return 'sales-dashboard';
+          case Role.AP_COORDINATOR: return 'ap-coord-dashboard';
+          case Role.AP_WORKER: return 'ap-worker-dashboard';
           default: return 'admin-dashboard';
       }
   });
@@ -101,6 +105,8 @@ const AppContent = () => {
                   case Role.ADVISOR:
                   case Role.MANAGER:
                   case Role.DIRECTOR: setCurrentView('sales-dashboard'); break;
+                  case Role.AP_COORDINATOR: setCurrentView('ap-coord-dashboard'); break;
+                  case Role.AP_WORKER: setCurrentView('ap-worker-dashboard'); break;
               }
           }
       }
@@ -209,28 +215,9 @@ const AppContent = () => {
     switch (currentUser.role) {
       case Role.SUPERADMIN:
         return (
-          <DashboardSuperadmin 
+          <DashboardAdminNew
             currentView={currentView}
-            orders={orders}
-            vouchers={vouchers}
-            users={users} 
-            companies={companies}
-            buybacks={buybacks}
-            auditLogs={auditLogs}
-            commissions={commissions}
-            notificationConfigs={notificationConfigs}
-            services={services}
-            systemConfig={systemConfig}
-            onApproveOrder={actions.handleApproveOrder}
-            onSimulateBankPayment={actions.handleBankPayment}
-            onApproveBuyback={actions.handleApproveBuyback}
-            onSimulateExpiration={actions.simulateExpiration}
-            onViewDocument={handleOpenDocument}
-            onUpdateNotificationConfig={actions.handleUpdateNotificationConfig}
-            onUpdateSystemConfig={actions.handleUpdateSystemConfig}
-            onUpdateCompanyConfig={actions.handleUpdateCompanyConfig}
-            onManualEmission={actions.handleManualEmission}
-            onToast={actions.addToast}
+            onViewChange={setCurrentView}
           />
         );
       case Role.HR:
@@ -241,22 +228,15 @@ const AppContent = () => {
               const myOrders = orders.filter(o => o.companyId === company.id);
               const myVouchers = vouchers.filter(v => v.companyId === company.id);
               return (
-                <DashboardHR
-                  currentView={currentView}
-                  onViewChange={setCurrentView}
+                <DashboardNewHR
                   company={company}
                   employees={myEmployees}
                   orders={myOrders}
                   vouchers={myVouchers}
-                  importHistory={importHistory}
-                  onPlaceOrder={actions.handlePlaceOrder}
-                  onDistribute={actions.handleDistribute}
-                  onPayOrder={() => actions.addToast("Integracja Bankowa", "Funkcja dostępna w pełnej wersji.", "INFO")}
-                  onDeactivateEmployee={actions.handleDeactivateEmployee}
-                  onViewProforma={(type, order) => handleOpenDocument(type, order, undefined, company)}
-                  onBulkImport={actions.handleBulkImport}
-                  onParsePayroll={actions.handleParseAndMatchPayroll}
-                  onExportPayrollTemplate={actions.handleExportPayrollTemplate}
+                  currentUser={currentUser}
+                  onLogout={actions.logout}
+                  currentView={currentView}
+                  onViewChange={setCurrentView}
                 />
               );
             }}
@@ -290,11 +270,63 @@ const AppContent = () => {
                 companies={companies}
                 orders={orders}
                 allUsers={users}
+                currentView={currentView}
+                onViewChange={setCurrentView}
+                onAddCompany={actions.handleAddCompany}
             />
+        );
+      case Role.AP_COORDINATOR:
+        return (
+          <DashboardAPCoordinator
+            currentUser={currentUser}
+            allUsers={users}
+            onLogout={actions.logout}
+            currentView={currentView}
+            onViewChange={setCurrentView}
+          />
+        );
+      case Role.AP_WORKER:
+        return (
+          <DashboardAPWorker
+            currentUser={currentUser}
+            onLogout={actions.logout}
+            currentView={currentView}
+            onViewChange={setCurrentView}
+          />
         );
       default: return <div>Rola nieznana</div>;
     }
   };
+
+  // AP roles mają własny pełnoekranowy layout — renderuj poza globalnym Sidebar/header
+  if (currentUser.role === Role.AP_COORDINATOR) {
+    return (
+      <>
+        <ToastContainer toasts={toasts} removeToast={actions.removeToast} />
+        <DashboardAPCoordinator
+          currentUser={currentUser}
+          allUsers={users}
+          onLogout={actions.logout}
+          currentView={currentView}
+          onViewChange={setCurrentView}
+        />
+      </>
+    );
+  }
+
+  if (currentUser.role === Role.AP_WORKER) {
+    return (
+      <>
+        <ToastContainer toasts={toasts} removeToast={actions.removeToast} />
+        <DashboardAPWorker
+          currentUser={currentUser}
+          onLogout={actions.logout}
+          currentView={currentView}
+          onViewChange={setCurrentView}
+        />
+      </>
+    );
+  }
 
   return (
     <div className={`flex h-screen font-sans bg-slate-50 text-slate-900`}>

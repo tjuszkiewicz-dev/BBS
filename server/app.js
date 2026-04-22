@@ -5,7 +5,7 @@ const cors = require('cors');
 const { generatePdf } = require('./services/pdfService');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3003;
 
 // Middleware
 app.use(cors()); // Allow Frontend to hit this API

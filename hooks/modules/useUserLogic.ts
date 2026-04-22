@@ -15,6 +15,13 @@ export const useUserLogic = (
 ) => {
   // Persistent State
   const [users, setUsers] = usePersistedState<User[]>('ebs_users_v1', INITIAL_USERS);
+
+  // Uzupełniaj brakujących użytkowników po aktualizacjach INITIAL_USERS
+  const existingIds = users.map(u => u.id);
+  const missing = INITIAL_USERS.filter(u => !existingIds.includes(u.id));
+  if (missing.length > 0) {
+    setUsers(prev => [...prev, ...missing]);
+  }
   const [importHistory, setImportHistory] = usePersistedState<ImportHistoryEntry[]>('ebs_import_history_v1', []);
 
   const handleUpdateEmployee = useCallback((userId: string, data: Partial<User>) => {
