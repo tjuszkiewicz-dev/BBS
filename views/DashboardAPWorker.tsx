@@ -21,12 +21,12 @@ export const DashboardAPWorker: React.FC<Props> = ({ currentUser, onLogout, curr
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="flex h-screen font-sans" style={{ background: '#030b1a' }}>
+    <div className="flex h-screen font-sans" style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#030b1a' }}>
 
       {/* SIDEBAR */}
       <aside
         className="flex flex-col flex-shrink-0 border-r border-white/[0.07] transition-all duration-300"
-        style={{ width: sidebarOpen ? 220 : 64, background: 'rgba(5,10,25,0.98)' }}
+        style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, width: sidebarOpen ? 220 : 64, minWidth: sidebarOpen ? 220 : 64, background: 'rgba(5,10,25,0.98)', height: '100%', overflow: 'hidden' }}
       >
         <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.07]">
           <img src="/logo.png" alt="logo" className="w-8 h-8 rounded-lg flex-shrink-0" />
@@ -83,7 +83,7 @@ export const DashboardAPWorker: React.FC<Props> = ({ currentUser, onLogout, curr
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto" style={{ flex: 1, overflow: 'auto', height: '100%' }}>
         {currentView === 'ap-worker-dashboard' && <WorkerTimer currentUser={currentUser} />}
         {currentView === 'ap-worker-schedule'  && <WorkerSchedule />}
         {currentView === 'ap-worker-history'   && <WorkerHistory />}

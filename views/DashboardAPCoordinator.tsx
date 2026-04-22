@@ -160,9 +160,9 @@ export const DashboardAPCoordinator: React.FC<Props> = ({ currentUser, onLogout,
   }, [coordinatorId]);
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white font-sans">
+    <div className="flex h-screen bg-slate-950 text-white font-sans" style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#020617' }}>
       <ToastArea />
-      <aside className="flex flex-col flex-shrink-0 border-r border-white/[0.07] transition-all duration-300" style={{ width: sidebarOpen ? 220 : 64, background: 'rgba(5,10,25,0.98)' }}>
+      <aside className="flex flex-col flex-shrink-0 border-r border-white/[0.07] transition-all duration-300" style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, width: sidebarOpen ? 220 : 64, minWidth: sidebarOpen ? 220 : 64, background: 'rgba(5,10,25,0.98)', height: '100%', overflow: 'hidden' }}>
         <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.07]">
           <img src="/logo.png" alt="logo" className="w-8 h-8 rounded-lg flex-shrink-0" />
           {sidebarOpen && (
@@ -206,7 +206,7 @@ export const DashboardAPCoordinator: React.FC<Props> = ({ currentUser, onLogout,
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto bg-slate-50 text-slate-900">
+      <main className="flex-1 overflow-auto bg-slate-50 text-slate-900" style={{ flex: 1, overflow: 'auto', background: '#f8fafc', height: '100%' }}>
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center text-slate-500">
