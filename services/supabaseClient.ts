@@ -7,4 +7,7 @@ if (!url || !anon) {
   console.warn('[Supabase] Brakuje VITE_SUPABASE_URL lub VITE_SUPABASE_ANON_KEY w .env.local');
 }
 
-export const supabase = createClient(url, anon);
+export const supabase = createClient(
+  url  || 'http://supabase-not-configured.local',
+  anon || 'anon-key-not-configured'
+);
