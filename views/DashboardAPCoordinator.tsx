@@ -1,9 +1,9 @@
-ï»¿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users, Clock, CalendarDays, FileText, BarChart2,
-  ChevronRight, LogOut, Menu, X, Plus, Timer,
+  LogOut, Plus, Timer,
   TrendingUp, Edit2, Trash2, CheckCircle, AlertCircle,
-  ChevronLeft, MapPin, RefreshCw
+  ChevronLeft, ChevronRight, RefreshCw, X
 } from 'lucide-react';
 import { User } from '../types';
 import {
@@ -17,7 +17,7 @@ import type { APWorker, WorkSchedule, WorkSession, PayrollRecord } from '../serv
 
 // NOTE: Run supabase/migrations/003_mock_auth_compat.sql in Supabase SQL Editor first.
 
-// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Helpers ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const fmtMinutes = (m: number) => {
   const h = Math.floor(m / 60);
@@ -43,7 +43,7 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
 }
 
-// â”€â”€â”€ Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Modal ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const Modal: React.FC<{ title: string; onClose: () => void; children: React.ReactNode; wide?: boolean }> = ({
   title, onClose, children, wide,
@@ -61,7 +61,7 @@ const Modal: React.FC<{ title: string; onClose: () => void; children: React.Reac
   </div>
 );
 
-// â”€â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Toast ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 type ToastType = 'success' | 'error';
 interface ToastMsg { id: number; text: string; type: ToastType }
@@ -86,7 +86,7 @@ const useToast = () => {
   return { show, ToastArea };
 };
 
-// â”€â”€â”€ Field â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Field ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const Field: React.FC<{ label: string; required?: boolean; children: React.ReactNode; half?: boolean }> = ({ label, required, children, half }) => (
   <div className={half ? 'flex-1' : 'w-full'}>
@@ -100,17 +100,9 @@ const Field: React.FC<{ label: string; required?: boolean; children: React.React
 const inputCls = 'w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all';
 const selectCls = inputCls + ' bg-white cursor-pointer';
 
-// â”€â”€â”€ Nav â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Nav ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
-const NAV = [
-  { id: 'ap-coord-dashboard', label: 'Pulpit',         icon: BarChart2 },
-  { id: 'ap-coord-workers',   label: 'Pracownicy',     icon: Users },
-  { id: 'ap-coord-schedule',  label: 'Grafik',         icon: CalendarDays },
-  { id: 'ap-coord-sessions',  label: 'Historia sesji', icon: Clock },
-  { id: 'ap-coord-payroll',   label: 'Lista plac',     icon: FileText },
-];
-
-// â”€â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Main ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 interface Props {
   currentUser: User;
@@ -121,7 +113,6 @@ interface Props {
 }
 
 export const DashboardAPCoordinator: React.FC<Props> = ({ currentUser, onLogout, currentView, onViewChange }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [coordinatorId, setCoordinatorId] = useState<string | null>(null);
   const [workers, setWorkers] = useState<APWorker[]>([]);
   const [loading, setLoading] = useState(true);
@@ -160,59 +151,65 @@ export const DashboardAPCoordinator: React.FC<Props> = ({ currentUser, onLogout,
   }, [coordinatorId]);
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white font-sans" style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#020617' }}>
+    <div className="min-h-screen" style={{ fontFamily: '"Segoe UI", system-ui, sans-serif' }}>
       <ToastArea />
-      <aside className="flex flex-col flex-shrink-0 border-r border-white/[0.07] transition-all duration-300" style={{ display: 'flex', flexDirection: 'column', flexShrink: 0, width: sidebarOpen ? 220 : 64, minWidth: sidebarOpen ? 220 : 64, background: 'rgba(5,10,25,0.98)', height: '100%', overflow: 'hidden' }}>
-        <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.07]">
-          <img src="/logo.png" alt="logo" className="w-8 h-8 rounded-lg flex-shrink-0" />
-          {sidebarOpen && (
-            <div className="min-w-0">
-              <p className="text-xs font-black text-white truncate">BBS Â· AP</p>
-              <p className="text-[10px] text-emerald-400 font-semibold truncate">Koordynator</p>
-            </div>
-          )}
-          <button onClick={() => setSidebarOpen(p => !p)} className="ml-auto text-white/30 hover:text-white/70 transition-colors">
-            {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
-          </button>
-        </div>
-        <nav className="flex-1 py-3 space-y-0.5 px-2">
-          {NAV.map(item => {
-            const active = currentView === item.id;
-            const Icon = item.icon;
-            return (
-              <button key={item.id} onClick={() => onViewChange(item.id)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                style={{ background: active ? 'rgba(249,115,22,0.15)' : 'transparent', color: active ? '#fb923c' : 'rgba(255,255,255,0.45)', border: active ? '1px solid rgba(249,115,22,0.25)' : '1px solid transparent' }}
-                onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
-                onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-              >
-                <Icon size={16} className="flex-shrink-0" />
-                {sidebarOpen && <span className="truncate">{item.label}</span>}
-              </button>
-            );
-          })}
-        </nav>
-        <div className="p-3 border-t border-white/[0.07]">
-          {sidebarOpen && (
-            <div className="px-2 py-2 mb-2">
-              <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
-              <p className="text-[10px] text-orange-400 font-semibold">Koordynator AP</p>
-            </div>
-          )}
-          <button onClick={onLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-400 hover:bg-red-500/10 transition-colors">
-            <LogOut size={14} />
-            {sidebarOpen && 'Wyloguj sie'}
-          </button>
-        </div>
-      </aside>
 
-      <main className="flex-1 overflow-auto bg-slate-50 text-slate-900" style={{ flex: 1, overflow: 'auto', background: '#f8fafc', height: '100%' }}>
+      {/* ¦¦ TOP BAR ¦¦ */}
+      <div className="bg-white border-b border-gray-200 px-6 flex items-center justify-between" style={{ height: 48 }}>
+        <div className="flex items-center gap-3">
+          <BarChart2 size={16} className="text-orange-500" />
+          <span className="font-semibold text-gray-800 text-sm">Agencja Pracy — Koordynator</span>
+          <span className="text-gray-300">|</span>
+          <span className="text-xs text-gray-500">{currentUser.name}</span>
+        </div>
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 px-2 py-1.5 rounded hover:bg-gray-100 transition-colors"
+        >
+          <LogOut size={14} /> Wyloguj
+        </button>
+      </div>
+
+      {/* ¦¦ TAB BAR ¦¦ */}
+      <div className="bg-white border-b border-gray-200 px-6">
+        <div className="flex gap-0">
+          {[
+            { id: 'ap-coord-dashboard', label: 'Pulpit',         icon: <BarChart2 size={16} /> },
+            { id: 'ap-coord-workers',   label: 'Pracownicy',     icon: <Users size={16} /> },
+            { id: 'ap-coord-schedule',  label: 'Grafik',         icon: <CalendarDays size={16} /> },
+            { id: 'ap-coord-sessions',  label: 'Historia sesji', icon: <Clock size={16} /> },
+            { id: 'ap-coord-payroll',   label: 'Lista p³ac',     icon: <FileText size={16} /> },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => onViewChange(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                currentView === tab.id
+                  ? 'border-orange-500 text-orange-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ¦¦ CONTENT ¦¦ */}
+      <div className="p-6">
         {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-slate-500">
+          <div className="flex items-center justify-center py-24">
+            <div className="text-center text-gray-400">
               <RefreshCw size={28} className="animate-spin mx-auto mb-3 text-orange-400" />
-              <p className="font-bold">Laczenie z baza danych...</p>
+              <p className="font-semibold text-sm">£¹czenie z baz¹ danych...</p>
             </div>
+          </div>
+        ) : dbError ? (
+          <div className="max-w-lg mx-auto mt-16 p-6 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+            <p className="font-bold mb-1">B³¹d po³¹czenia z Supabase</p>
+            <p>{dbError}</p>
+            <button onClick={initDb} className="mt-3 text-xs text-red-600 underline">Spróbuj ponownie</button>
           </div>
         ) : (
           <>
@@ -231,78 +228,78 @@ export const DashboardAPCoordinator: React.FC<Props> = ({ currentUser, onLogout,
             )}
           </>
         )}
-      </main>
+      </div>
     </div>
   );
 };
 
-// â”€â”€â”€ Pulpit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Pulpit ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const CoordDashboardHome: React.FC<{ workers: APWorker[]; onViewChange: (v: string) => void }> = ({ workers, onViewChange }) => {
   const activeCount = workers.filter(w => w.status === 'active').length;
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-black text-slate-900">Pulpit Koordynatora</h1>
-        <p className="text-slate-500 text-sm mt-1">Przeglad modulu Agencji Pracy</p>
+    <div>
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-gray-900">Pulpit Koordynatora</h1>
+        <p className="text-gray-500 text-sm mt-0.5">Przegl¹d modu³u Agencji Pracy</p>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
           { label: 'Pracownicy AP', value: activeCount, color: '#f97316', icon: Users },
-          { label: 'Aktywne sesje dzis', value: 'â€”', color: '#10b981', icon: Timer },
-          { label: 'Godziny w mies.', value: 'â€”', color: '#3b82f6', icon: Clock },
-          { label: 'Suma brutto', value: 'â€” PLN', color: '#8b5cf6', icon: TrendingUp },
+          { label: 'Aktywne sesje dziœ', value: '—', color: '#10b981', icon: Timer },
+          { label: 'Godziny w mies.', value: '—', color: '#3b82f6', icon: Clock },
+          { label: 'Suma brutto', value: '— PLN', color: '#8b5cf6', icon: TrendingUp },
         ].map(c => {
           const Icon = c.icon;
           return (
-            <div key={c.label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div key={c.label} className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">{c.label}</span>
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: c.color + '20' }}>
-                  <Icon size={16} style={{ color: c.color }} />
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{c.label}</span>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: c.color + '18' }}>
+                  <Icon size={15} style={{ color: c.color }} />
                 </div>
               </div>
-              <p className="text-3xl font-black text-slate-900">{c.value}</p>
+              <p className="text-2xl font-bold text-gray-900">{c.value}</p>
             </div>
           );
         })}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
         {[
           { label: 'Dodaj pracownika AP', icon: Plus, view: 'ap-coord-workers', color: '#f97316' },
-          { label: 'Zarzadzaj grafikiem', icon: CalendarDays, view: 'ap-coord-schedule', color: '#3b82f6' },
-          { label: 'Generuj liste plac', icon: FileText, view: 'ap-coord-payroll', color: '#8b5cf6' },
+          { label: 'Zarz¹dzaj grafikiem', icon: CalendarDays, view: 'ap-coord-schedule', color: '#3b82f6' },
+          { label: 'Generuj listê p³ac', icon: FileText, view: 'ap-coord-payroll', color: '#8b5cf6' },
         ].map(a => {
           const Icon = a.icon;
           return (
             <button key={a.label} onClick={() => onViewChange(a.view)}
-              className="flex items-center gap-4 p-5 bg-white border border-slate-200 rounded-2xl hover:border-orange-300 hover:shadow-md transition-all text-left group"
+              className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:shadow-sm transition-all text-left group"
             >
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: a.color + '15' }}>
-                <Icon size={20} style={{ color: a.color }} />
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: a.color + '15' }}>
+                <Icon size={18} style={{ color: a.color }} />
               </div>
-              <span className="font-bold text-slate-800 group-hover:text-orange-600 transition-colors">{a.label}</span>
-              <ChevronRight size={16} className="ml-auto text-slate-300 group-hover:text-orange-400" />
+              <span className="font-medium text-gray-700 group-hover:text-orange-600 text-sm transition-colors">{a.label}</span>
+              <ChevronRight size={14} className="ml-auto text-gray-300 group-hover:text-orange-400" />
             </button>
           );
         })}
       </div>
       {workers.length > 0 && (
-        <div className="mt-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-black text-slate-800">Pracownicy AP</h2>
-            <button onClick={() => onViewChange('ap-coord-workers')} className="text-xs font-bold text-orange-500 hover:text-orange-600">Wszyscy â†’</button>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-800 text-sm">Pracownicy AP</h2>
+            <button onClick={() => onViewChange('ap-coord-workers')} className="text-xs font-medium text-orange-500 hover:text-orange-600">Wszyscy ›</button>
           </div>
           {workers.slice(0, 5).map(w => (
-            <div key={w.id} className="px-6 py-3 flex items-center gap-3 border-b border-slate-50 last:border-0 hover:bg-slate-50">
-              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-black text-xs flex-shrink-0">
+            <div key={w.id} className="px-5 py-3 flex items-center gap-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-bold text-xs flex-shrink-0">
                 {w.first_name.charAt(0)}{w.last_name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-slate-800 text-sm truncate">{w.first_name} {w.last_name}</p>
-                <p className="text-xs text-slate-400 truncate">{w.email}</p>
+                <p className="font-medium text-gray-800 text-sm truncate">{w.first_name} {w.last_name}</p>
+                <p className="text-xs text-gray-400 truncate">{w.email}</p>
               </div>
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${w.status === 'active' ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400 bg-slate-100'}`}>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${w.status === 'active' ? 'text-emerald-600 bg-emerald-50' : 'text-gray-400 bg-gray-100'}`}>
                 {w.status === 'active' ? 'Aktywny' : 'Nieaktywny'}
               </span>
             </div>
@@ -313,7 +310,7 @@ const CoordDashboardHome: React.FC<{ workers: APWorker[]; onViewChange: (v: stri
   );
 };
 
-// â”€â”€â”€ Worker Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Worker Modal ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 interface WorkerFormData {
   first_name: string; last_name: string; email: string; phone: string;
@@ -473,7 +470,7 @@ const WorkerModal: React.FC<{
   );
 };
 
-// â”€â”€â”€ Pracownicy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Pracownicy ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const CoordWorkersList: React.FC<{
   workers: APWorker[]; coordinatorId: string;
@@ -492,7 +489,7 @@ const CoordWorkersList: React.FC<{
   };
 
   return (
-    <div className="p-8">
+    <div className="">
       {(showAdd || editing) && (
         <WorkerModal
           initial={editing ?? undefined} coordinatorId={coordinatorId}
@@ -511,9 +508,9 @@ const CoordWorkersList: React.FC<{
         </Modal>
       )}
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Pracownicy AP</h1>
+          <h1 className="text-xl font-bold text-gray-900">Pracownicy AP</h1>
           <p className="text-slate-500 text-sm mt-1">{workers.length} zarejestrowanych</p>
         </div>
         <div className="flex items-center gap-3">
@@ -557,13 +554,13 @@ const CoordWorkersList: React.FC<{
                     </td>
                     <td className="px-5 py-3">
                       <p className="text-sm text-slate-700">{w.email}</p>
-                      <p className="text-xs text-slate-400">{w.phone ?? 'â€”'}</p>
+                      <p className="text-xs text-slate-400">{w.phone ?? '—'}</p>
                     </td>
                     <td className="px-5 py-3 text-sm text-slate-600">{w.nationality}</td>
                     <td className="px-5 py-3 text-sm text-slate-600">
-                      {w.document_number ? <span><span className="text-xs text-slate-400">{w.document_type === 'passport' ? 'Paszp.' : 'Dow.'}</span> {w.document_number}</span> : 'â€”'}
+                      {w.document_number ? <span><span className="text-xs text-slate-400">{w.document_type === 'passport' ? 'Paszp.' : 'Dow.'}</span> {w.document_number}</span> : '—'}
                     </td>
-                    <td className="px-5 py-3 text-sm font-bold text-slate-800">{w.hourly_rate ? `${w.hourly_rate} PLN` : 'â€”'}</td>
+                    <td className="px-5 py-3 text-sm font-bold text-slate-800">{w.hourly_rate ? `${w.hourly_rate} PLN` : '—'}</td>
                     <td className="px-5 py-3">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${w.status === 'active' ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400 bg-slate-100'}`}>
                         {w.status === 'active' ? 'Aktywny' : 'Nieaktywny'}
@@ -586,7 +583,7 @@ const CoordWorkersList: React.FC<{
   );
 };
 
-// â”€â”€â”€ Grafik â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Grafik ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const AddScheduleModal: React.FC<{
   workers: APWorker[]; coordinatorId: string; prefillDate?: string;
@@ -677,7 +674,7 @@ const CoordSchedule: React.FC<{
   const getEntry = (workerId: string, date: string) => schedules.find(s => s.worker_id === workerId && s.date === date);
 
   return (
-    <div className="p-8">
+    <div className="">
       {showAdd && (
         <AddScheduleModal
           workers={activeWorkers} coordinatorId={coordinatorId} prefillDate={prefillDate}
@@ -686,14 +683,14 @@ const CoordSchedule: React.FC<{
           toast={toast}
         />
       )}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Grafik pracy</h1>
+          <h1 className="text-xl font-bold text-gray-900">Grafik pracy</h1>
           <p className="text-slate-500 text-sm mt-1">Tygodniowy widok przypisania lokalizacji</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={() => setWeekOffset(p => p - 1)} className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100"><ChevronLeft size={16} /></button>
-          <span className="text-sm font-bold text-slate-700 min-w-[140px] text-center">{fmtDate(weekDates[0])} â€“ {fmtDate(weekDates[6])}</span>
+          <span className="text-sm font-bold text-slate-700 min-w-[140px] text-center">{fmtDate(weekDates[0])} – {fmtDate(weekDates[6])}</span>
           <button onClick={() => setWeekOffset(p => p + 1)} className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100"><ChevronRight size={16} /></button>
           <button onClick={() => { setPrefillDate(undefined); setShowAdd(true); }} className="flex items-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold text-sm transition-colors">
             <Plus size={16} /> Dodaj wpis
@@ -758,7 +755,7 @@ const CoordSchedule: React.FC<{
   );
 };
 
-// â”€â”€â”€ Sesje â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Sesje ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const CorrectModal: React.FC<{
   session: WorkSession; onClose: () => void; onSaved: () => void;
@@ -826,14 +823,14 @@ const CoordSessions: React.FC<{
   const badgeLabel = { active: 'Aktywna', completed: 'Zakonczona', corrected: 'Skorygowana' };
 
   return (
-    <div className="p-8">
+    <div className="">
       {correcting && (
         <CorrectModal session={correcting} onClose={() => setCorrecting(null)} onSaved={() => { setCorrecting(null); load(); }} toast={toast} />
       )}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Historia sesji pracy</h1>
-          <p className="text-slate-500 text-sm mt-1">Ostatnie 30 dni Â· {sessions.length} sesji</p>
+          <h1 className="text-xl font-bold text-gray-900">Historia sesji pracy</h1>
+          <p className="text-slate-500 text-sm mt-1">Ostatnie 30 dni · {sessions.length} sesji</p>
         </div>
         <button onClick={load} className="p-2 rounded-xl border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"><RefreshCw size={16} /></button>
       </div>
@@ -860,14 +857,14 @@ const CoordSessions: React.FC<{
                 {sessions.map(s => (
                   <tr key={s.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-3 font-bold text-slate-800 text-sm">
-                      {s.ap_workers ? `${s.ap_workers.first_name} ${s.ap_workers.last_name}` : 'â€”'}
+                      {s.ap_workers ? `${s.ap_workers.first_name} ${s.ap_workers.last_name}` : '—'}
                     </td>
                     <td className="px-5 py-3 text-sm text-slate-600">{s.date}</td>
                     <td className="px-5 py-3 text-sm text-slate-600">{new Date(s.start_time).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</td>
                     <td className="px-5 py-3 text-sm text-slate-600">
                       {s.end_time ? new Date(s.end_time).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : <span className="text-emerald-500 font-semibold">w toku</span>}
                     </td>
-                    <td className="px-5 py-3 text-sm font-bold text-slate-800">{s.total_minutes != null ? fmtMinutes(s.total_minutes) : 'â€”'}</td>
+                    <td className="px-5 py-3 text-sm font-bold text-slate-800">{s.total_minutes != null ? fmtMinutes(s.total_minutes) : '—'}</td>
                     <td className="px-5 py-3">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badgeCls[s.status]}`}>{badgeLabel[s.status]}</span>
                     </td>
@@ -885,7 +882,7 @@ const CoordSessions: React.FC<{
   );
 };
 
-// â”€â”€â”€ Lista plac â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ¦¦¦ Lista plac ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
 
 const CoordPayroll: React.FC<{
   coordinatorId: string;
@@ -920,10 +917,10 @@ const CoordPayroll: React.FC<{
   const totalHours = records.reduce((acc, r) => acc + r.total_minutes, 0) / 60;
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Lista plac</h1>
+          <h1 className="text-xl font-bold text-gray-900">Lista plac</h1>
           <p className="text-slate-500 text-sm mt-1">Zestawienia wynagrodzen pracownikow AP</p>
         </div>
         <div className="flex items-center gap-3">
@@ -974,7 +971,7 @@ const CoordPayroll: React.FC<{
                 {records.map(r => (
                   <tr key={r.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-3 font-bold text-slate-800 text-sm">
-                      {r.ap_workers ? `${r.ap_workers.first_name} ${r.ap_workers.last_name}` : 'â€”'}
+                      {r.ap_workers ? `${r.ap_workers.first_name} ${r.ap_workers.last_name}` : '—'}
                     </td>
                     <td className="px-5 py-3 text-sm text-slate-600">{r.month}</td>
                     <td className="px-5 py-3 text-sm font-bold text-slate-800">{(r.total_minutes / 60).toFixed(2)}h</td>
